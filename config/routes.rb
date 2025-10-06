@@ -1,23 +1,36 @@
-# config/routes.rb
 Rails.application.routes.draw do
+  # -------------------- Admin --------------------
   namespace :admin do
+    # Dashboard
     root to: "dashboard#index"
     get "dashboard", to: "dashboard#index", as: :dashboard
 
+    # Admin management
+    get "all_users", to: "dashboard#all_users"
+    get "all_recipes", to: "dashboard#all_recipes"
+    get "reported_recipes", to: "dashboard#reported_recipes"
+
+    # Actions for admin buttons
+    patch "users/:id/toggle_active", to: "dashboard#toggle_user_active", as: :toggle_user_active
+    delete "users/:id", to: "dashboard#destroy_user", as: :destroy_user
+
+    delete "recipes/:id", to: "dashboard#destroy_recipe", as: :destroy_recipe
+    get "recipes/:id/view", to: "dashboard#view_recipe", as: :view_recipe
+
+    # Existing resource routes
     resources :users, only: [:index, :show, :edit, :update, :destroy]
     resources :recipes, only: [:index, :show, :edit, :update, :destroy]
-    resources :active_users, only: [:index, :show, :edit, :update, :destroy]
-    resources :popular_recipes, only: [:index, :show, :edit, :update, :destroy]
-    resources :reported_recipes, only: [:index, :show, :edit, :update, :destroy]
   end
 
+  # -------------------- Frontend --------------------
   root "feeds#index"
   get "feed", to: "feeds#index"
-
   get "search", to: "search#index"
 
+  # -------------------- Devise --------------------
   devise_for :users
 
+  # -------------------- Users --------------------
   resources :users, param: :username, only: [:show, :edit, :update] do
     member do
       post :follow
@@ -25,14 +38,14 @@ Rails.application.routes.draw do
     end
   end
 
+  # -------------------- Recipes --------------------
   resources :recipes do
     resources :comments, only: [:create, :destroy]
     resource :like, only: [:create, :destroy]
     resource :bookmark, only: [:create, :destroy]
   end
 
+  # -------------------- Bookmarks & Notifications --------------------
   resources :bookmarks, only: [:index]
-
-  # ✅ Notifications without mark_as_read
   resources :notifications, only: [:index, :show]
 end

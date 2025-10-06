@@ -16,8 +16,8 @@ class ApplicationController < ActionController::Base
 
   # ✅ Redirect users after login
   def after_sign_in_path_for(resource)
-    # Admins go to admin dashboard, others to feed
-    resource.admin? ? admin_root_path : feed_path
+    # Only admins go to admin dashboard
+    resource.admin? ? admin_dashboard_path : feed_path
   end
 
   # Redirect users after sign up

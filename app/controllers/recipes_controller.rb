@@ -1,17 +1,23 @@
-# app/controllers/recipes_controller.rb
 class RecipesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_recipe, only: [:show, :edit, :update, :destroy]
 
   # GET /recipes
   def index
-    @recipes = Recipe.includes(:user, images_attachments: :blob).order(created_at: :desc)
+    # Eager load user and images efficiently
+    @recipes = Recipe
+      .includes(:user, images_attachments: :blob)  # avoid N+1 queries
+      .order(created_at: :desc)
+      .page(params[:page])                        # pagination
+      .per(10)                                    # limit 10 per page
   end
 
   # GET /recipes/:id
   def show
     @comment = Comment.new
-    @comments = @recipe.comments.includes(:user).order(created_at: :asc)
+    @comments = @recipe.comments
+                       .includes(:user)          # eager load comment authors
+                       .order(created_at: :asc)
 
     respond_to do |format|
       format.html
@@ -43,12 +49,12 @@ class RecipesController < ApplicationController
 
   # GET /recipes/:id/edit
   def edit
-    redirect_to recipe_path(@recipe), alert: "Not authorized" unless @recipe.user == current_user || current_user.admin?
+    redirect_to recipe_path(@recipe), alert: "Not authorized" unless authorized?
   end
 
   # PATCH/PUT /recipes/:id
   def update
-    if @recipe.user == current_user || current_user.admin?
+    if authorized?
       if @recipe.update(recipe_params)
         redirect_to recipe_path(@recipe), notice: "Recipe successfully updated."
       else
@@ -61,7 +67,7 @@ class RecipesController < ApplicationController
 
   # DELETE /recipes/:id
   def destroy
-    if @recipe.user == current_user || current_user.admin?
+    if authorized?
       @recipe.destroy
       redirect_to feed_path, notice: "Recipe successfully deleted."
     else
@@ -77,5 +83,9 @@ class RecipesController < ApplicationController
 
   def recipe_params
     params.require(:recipe).permit(:title, :description, :ingredients, :instructions, :cooking_time, :difficulty, images: [])
+  end
+
+  def authorized?
+    @recipe.user == current_user || current_user.admin?
   end
 end

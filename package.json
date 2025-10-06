@@ -1,0 +1,11 @@
+{
+  "name": "sw_kitchen_bites",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/wjnaby/sw_kitchen_bites.git",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "react": "^19.2.0"
+  }
+}

@@ -1,10 +1,11 @@
+# app/controllers/admin/active_users_controller.rb
 module Admin
   class ActiveUsersController < ApplicationController
     before_action :require_admin
     before_action :set_user, only: [:show, :edit, :update, :destroy]
 
     def index
-      @active_users = User.joins(:recipes).distinct
+      @active_users = User.order(created_at: :desc)
     end
 
     def show; end

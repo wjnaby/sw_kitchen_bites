@@ -25,117 +25,117 @@
   </head>
 
   <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">
-      <div class="container">
-        <!-- Brand -->
-        <%= link_to(
-              current_user&.admin? ? admin_dashboard_path : root_path,
-              class: "navbar-brand fw-bold",
-              data: { turbo: false }
-            ) do %>
-          🍴 SW Kitchen Bites
-        <% end %>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">
+  <div class="container">
+    <!-- Brand -->
+    <%= link_to(
+          current_user&.admin? ? admin_dashboard_path : root_path,
+          class: "navbar-brand fw-bold",
+          data: { turbo: false }
+        ) do %>
+      🍴 SW Kitchen Bites
+    <% end %>
 
-        <!-- Toggler -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    <!-- Toggler -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <% if current_user %>
-            <ul class="navbar-nav me-3">
-              <% if current_user.admin? %>
-                <!-- Admin Links -->
-                <li class="nav-item">
-                  <%= link_to "Dashboard", admin_dashboard_path, class: "nav-link", data: { turbo: false } %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Active Users", admin_active_users_path, class: "nav-link", data: { turbo: false } %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Popular Recipes", admin_popular_recipes_path, class: "nav-link", data: { turbo: false } %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Reported Recipes", admin_reported_recipes_path, class: "nav-link", data: { turbo: false } %>
-                </li>
-              <% else %>
-                <!-- Normal user links -->
-                <li class="nav-item">
-                  <%= link_to "Feed", feed_path, class: "nav-link" %>
-                </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarRecipes" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-turbo="false">
-                    Recipes
-                  </a>
-                  <ul class="dropdown-menu" aria-labelledby="navbarRecipes">
-                    <li><%= link_to "All Recipes", recipes_path, class: "dropdown-item" %></li>
-                    <li><%= link_to "Post Recipe", new_recipe_path, class: "dropdown-item" %></li>
-                  </ul>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Bookmarks", bookmarks_path, class: "nav-link" %>
-                </li>
-              <% end %>
-            </ul>
-
-            <!-- Center Search -->
-            <form class="d-flex mx-auto" style="max-width: 400px; width: 100%;" action="<%= search_path %>" method="get" data-turbo="false">
-              <input type="text" name="q" value="<%= params[:q] %>" class="form-control me-2" placeholder="Search users or recipes...">
-              <button type="submit" class="btn btn-outline-success">Search</button>
-            </form>
-
-            <!-- Right: Dark Mode + Notifications + Profile -->
-            <ul class="navbar-nav ms-auto align-items-center">
-              <li class="nav-item me-3">
-                <button id="theme-toggle" class="btn btn-outline-secondary">🌙 / ☀️</button>
-              </li>
-
-              <li class="nav-item me-3">
-                <% unread_count = current_user.notifications.where(read: false).count %>
-                <%= link_to notifications_path, class: "nav-link position-relative", data: { turbo: false } do %>
-                  🔔
-                  <% if unread_count > 0 %>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      <%= unread_count %>
-                    </span>
-                  <% end %>
-                <% end %>
-              </li>
-
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarProfile" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-turbo="false">
-                  <% if current_user.avatar.attached? %>
-                    <%= image_tag current_user.avatar, class: "rounded-circle me-2", style: "width: 32px; height: 32px; object-fit: cover;" %>
-                  <% else %>
-                    <span class="me-2">👤</span>
-                  <% end %>
-                  <span><%= current_user.username %></span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarProfile">
-                  <li><%= link_to "View Profile", user_path(current_user.username), class: "dropdown-item", data: { turbo: false } %></li>
-                  <li><%= link_to "Edit Profile", edit_user_path(current_user.username), class: "dropdown-item", data: { turbo: false } %></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li>
-                    <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "dropdown-item", data: { turbo: false } %>
-                  </li>
-                </ul>
-              </li>
-            </ul>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <% if current_user %>
+        <ul class="navbar-nav me-3">
+          <% if current_user.admin? %>
+            <!-- Admin Links grouped in dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="adminPanelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Admin Panel
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="adminPanelDropdown">
+                <li><%= link_to "Dashboard", admin_dashboard_path, class: "dropdown-item", data: { turbo: false } %></li>
+                <li><%= link_to "All Users", admin_all_users_path, class: "dropdown-item", data: { turbo: false } %></li>
+                <li><%= link_to "All Recipes", admin_all_recipes_path, class: "dropdown-item", data: { turbo: false } %></li>
+                <li><%= link_to "Reported Recipes", admin_reported_recipes_path, class: "dropdown-item", data: { turbo: false } %></li>
+              </ul>
+            </li>
           <% else %>
-            <!-- Guest Menu -->
-            <ul class="navbar-nav ms-auto align-items-center">
-              <li class="nav-item">
-                <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
-              </li>
-              <li class="nav-item d-flex align-items-center">
-                <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-success text-white px-3 ms-2" %>
+            <!-- Normal user links -->
+            <li class="nav-item">
+              <%= link_to "Feed", feed_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarRecipes" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-turbo="false">
+                Recipes
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarRecipes">
+                <li><%= link_to "All Recipes", recipes_path, class: "dropdown-item" %></li>
+                <li><%= link_to "Post Recipe", new_recipe_path, class: "dropdown-item" %></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Bookmarks", bookmarks_path, class: "nav-link" %>
+            </li>
+          <% end %>
+        </ul>
+
+        <!-- Center Search -->
+        <form class="d-flex mx-auto" style="max-width: 400px; width: 100%;" action="<%= search_path %>" method="get" data-turbo="false">
+          <input type="text" name="q" value="<%= params[:q] %>" class="form-control me-2" placeholder="Search users or recipes...">
+          <button type="submit" class="btn btn-outline-success">Search</button>
+        </form>
+
+        <!-- Right: Dark Mode + Notifications + Profile -->
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item me-3">
+            <button id="theme-toggle" class="btn btn-outline-secondary">🌙 / ☀️</button>
+          </li>
+
+          <li class="nav-item me-3">
+            <% unread_count = current_user.notifications.where(read: false).count %>
+            <%= link_to notifications_path, class: "nav-link position-relative", data: { turbo: false } do %>
+              🔔
+              <% if unread_count > 0 %>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  <%= unread_count %>
+                </span>
+              <% end %>
+            <% end %>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarProfile" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-turbo="false">
+              <% if current_user.avatar.attached? %>
+                <%= image_tag current_user.avatar, class: "rounded-circle me-2", style: "width: 32px; height: 32px; object-fit: cover;" %>
+              <% else %>
+                <span class="me-2">👤</span>
+              <% end %>
+              <span><%= current_user.username %></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarProfile">
+              <li><%= link_to "View Profile", user_path(current_user.username), class: "dropdown-item", data: { turbo: false } %></li>
+              <li><%= link_to "Edit Profile", edit_user_path(current_user.username), class: "dropdown-item", data: { turbo: false } %></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "dropdown-item", data: { turbo: false } %>
               </li>
             </ul>
-          <% end %>
-        </div>
-      </div>
-    </nav>
+          </li>
+        </ul>
+      <% else %>
+        <!-- Guest Menu -->
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-success text-white px-3 ms-2" %>
+          </li>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+</nav>
+
 
     <!-- Flash messages -->
     <div class="container mt-3">
