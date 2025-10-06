@@ -1,0 +1,91 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Search Results for "<%= @query %>"</h2>
+
+  <ul class="nav nav-tabs mb-3" id="searchTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+        Users (<%= @users.count %>)
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="recipes-tab" data-bs-toggle="tab" data-bs-target="#recipes" type="button" role="tab">
+        Recipes (<%= @recipes.count %>)
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="searchTabsContent">
+    <!-- Users Tab -->
+    <div class="tab-pane fade show active" id="users" role="tabpanel">
+      <% if @users.present? %>
+        <ul class="list-group">
+          <% @users.each do |user| %>
+            <li class="list-group-item d-flex align-items-center">
+              <% if user.avatar.attached? %>
+                <%= link_to image_tag(user.avatar.variant(resize_to_limit: [40, 40]), class: "rounded-circle me-2", style: "object-fit: cover; width:40px; height:40px"), user_path(username: user.username) %>
+              <% end %>
+              <%= link_to user.username, user_path(username: user.username), class: "fw-bold text-decoration-none" %>
+
+              <% if user == current_user %>
+                <%= link_to "Edit Profile", edit_user_path(current_user.username), class: "btn btn-sm btn-outline-secondary ms-auto" %>
+              <% elsif current_user %>
+                <% if current_user.following.exists?(id: user.id) %>
+                  <%= button_to "Unfollow", unfollow_user_path(username: user.username), method: :delete, class: "btn btn-sm btn-outline-danger ms-auto" %>
+                <% else %>
+                  <%= button_to "Follow", follow_user_path(username: user.username), method: :post, class: "btn btn-sm btn-outline-primary ms-auto" %>
+                <% end %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-muted">No users found.</p>
+      <% end %>
+    </div>
+
+    <!-- Recipes Tab -->
+    <div class="tab-pane fade" id="recipes" role="tabpanel">
+      <% if @recipes.present? %>
+        <div class="row">
+          <% @recipes.each do |recipe| %>
+            <div class="col-md-4 mb-4">
+              <div class="card h-100 shadow-sm">
+                <% if recipe.images.attached? %>
+                  <%= link_to recipe_path(recipe) do %>
+                    <%= image_tag recipe.images.first.variant(resize_to_limit: [300, 200]), class: "card-img-top", style: "object-fit: cover; width:100%; height:200px;" %>
+                  <% end %>
+                <% end %>
+
+                <div class="card-body text-center d-flex flex-column">
+                  <h5 class="card-title"><%= link_to recipe.title, recipe_path(recipe) %></h5>
+                  <p class="text-muted mb-1">
+                    By <%= link_to recipe.user.username, user_path(username: recipe.user.username), class: "fw-bold" %>
+                  </p>
+
+                  <% if recipe.user == current_user %>
+                    <div class="mt-auto">
+                      <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-secondary btn-sm me-1" %>
+                      <%= link_to "Delete", recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-sm" %>
+                    </div>
+                  <% elsif current_user %>
+                    <div class="mt-auto mb-2">
+                      <% if recipe.likes.exists?(user: current_user) %>
+                        <%= button_to "❤️ Unlike (#{recipe.likes.count})", recipe_like_path(recipe), method: :delete, class: "btn btn-outline-danger btn-sm" %>
+                      <% else %>
+                        <%= button_to "🤍 Like (#{recipe.likes.count})", recipe_like_path(recipe), method: :post, class: "btn btn-primary btn-sm" %>
+                      <% end %>
+                    </div>
+                  <% end %>
+
+                  <%= link_to "💬 Comments (#{recipe.comments.count})", recipe_path(recipe), class: "btn btn-secondary btn-sm mt-1" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-center text-muted">No recipes found.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

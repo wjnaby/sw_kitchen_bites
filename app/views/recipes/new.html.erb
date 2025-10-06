@@ -1,0 +1,37 @@
+<%= form_with(model: @recipe, local: true, html: { multipart: true }) do |f| %>
+  <div class="mb-3">
+    <%= f.label :title, class: "form-label" %>
+    <%= f.text_field :title, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :ingredients, class: "form-label" %>
+    <%= f.text_area :ingredients, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :instructions, class: "form-label" %>
+    <%= f.text_area :instructions, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :cooking_time, "Cooking Time (mins)", class: "form-label" %>
+    <%= f.number_field :cooking_time, class: "form-control" %>
+  </div>
+
+  <!-- Multiple Images -->
+  <div class="mb-3">
+    <%= f.label :images, "Upload Recipe Images (Max 5)", class: "form-label" %>
+    <%= f.file_field :images, multiple: true, class: "form-control" %>
+
+    <% if @recipe.images.attached? %>
+      <div class="mt-2 d-flex flex-wrap gap-2">
+        <% @recipe.images.each do |img| %>
+          <%= image_tag img.variant(resize_to_limit: [200, 200]).processed, class: "img-thumbnail" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= f.submit "Save Recipe", class: "btn btn-primary" %>
+<% end %>

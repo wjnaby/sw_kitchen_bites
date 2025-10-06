@@ -1,0 +1,7 @@
+<p>
+  <strong><%= comment.user.name %>:</strong>
+  <%= comment.body %>
+  <% if comment.user == current_user %>
+    <%= link_to "Delete", recipe_comment_path(comment.recipe, comment), method: :delete, data: { confirm: "Are you sure?" } %>
+  <% end %>
+</p>

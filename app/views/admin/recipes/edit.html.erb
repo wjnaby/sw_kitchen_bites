@@ -1,0 +1,26 @@
+<div class="container mt-4">
+  <h1>Manage Reported Recipes</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>User</th>
+        <th>Reports</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @recipes.each do |recipe| %>
+        <tr>
+          <td><%= recipe.title %></td>
+          <td><%= recipe.user.username %></td>
+          <td><%= recipe.reports.count %></td>
+          <td>
+            <%= link_to "Edit", edit_admin_recipe_path(recipe), class: "btn btn-sm btn-primary" %>
+            <%= link_to "Delete", admin_recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-sm btn-danger" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,38 @@
+<h2>My Recipes</h2>
+<%= link_to "Post New Recipe", new_recipe_path, class: "btn btn-success mb-3" %>
+
+<div class="row">
+  <% @recipes.select { |recipe| recipe.user == current_user }.each do |recipe| %>
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm p-3 h-100">
+        <h5><%= recipe.title %></h5>
+
+        <!-- Display multiple images -->
+        <% if recipe.images.attached? %>
+          <div class="d-flex flex-wrap gap-1 mb-2">
+            <% recipe.images.each do |img| %>
+              <div style="width: 80px; height: 80px; overflow: hidden;">
+                <%= image_tag img.variant(resize_to_limit: [80, 80]).processed, class: "rounded" %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <p>Cooking Time: <%= recipe.cooking_time %> mins</p>
+
+        <% if recipe.instructions.present? %>
+          <p><strong>Instructions:</strong> <%= truncate(recipe.instructions, length: 50) %></p>
+        <% end %>
+
+        <div class="d-flex gap-1 mt-2">
+          <%= link_to "View", recipe_path(recipe), class: "btn btn-primary btn-sm" %>
+
+          <% if recipe.user == current_user || current_user.admin? %>
+            <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-secondary btn-sm" %>
+            <%= link_to "Delete", recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-sm" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

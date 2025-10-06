@@ -1,0 +1,22 @@
+<h3>Comments</h3>
+
+<!-- Comment form -->
+<%= form_with(model: [@recipe, Comment.new], local: true) do |f| %>
+  <div class="mb-3">
+    <%= f.text_area :body, class: "form-control", placeholder: "Write a comment..." %>
+  </div>
+  <%= f.submit "Post Comment", class: "btn btn-primary" %>
+<% end %>
+
+<!-- Display existing comments -->
+<div class="mt-3">
+  <% @recipe.comments.each do |comment| %>
+    <p>
+      <strong><%= comment.user.name %>:</strong>
+      <%= comment.body %>
+      <% if comment.user == current_user %>
+        <%= link_to "Delete", recipe_comment_path(@recipe, comment), method: :delete, data: { confirm: "Are you sure?" } %>
+      <% end %>
+    </p>
+  <% end %>
+</div>

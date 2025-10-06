@@ -1,0 +1,23 @@
+<h1>Recently Reported Recipes</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Reported By</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @reported_recipes.each do |recipe| %>
+      <tr>
+        <td><%= recipe.title %></td>
+        <td><%= recipe.user.username %></td>
+        <td>
+          <%= link_to "View", admin_reported_recipe_path(recipe), class: "btn btn-sm btn-primary" %>
+          <%= link_to "Edit", edit_admin_reported_recipe_path(recipe), class: "btn btn-sm btn-warning" %>
+          <%= link_to "Delete", admin_reported_recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-sm btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

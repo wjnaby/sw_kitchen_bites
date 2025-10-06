@@ -1,0 +1,103 @@
+<div class="container mt-4">
+  <h1 class="mb-4">📊 Admin Dashboard</h1>
+
+  <!-- Stats Cards -->
+  <div class="row">
+    <!-- Total Users -->
+    <div class="col-md-4 mb-3">
+      <div class="card text-center shadow-sm border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary">👥 Users</h5>
+          <h2><%= @users_count %></h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Recipes -->
+    <div class="col-md-4 mb-3">
+      <div class="card text-center shadow-sm border-success">
+        <div class="card-body">
+          <h5 class="card-title text-success">📖 Recipes</h5>
+          <h2><%= @recipes_count %></h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Reports -->
+    <div class="col-md-4 mb-3">
+      <div class="card text-center shadow-sm border-danger">
+        <div class="card-body">
+          <h5 class="card-title text-danger">🚨 Reports</h5>
+          <h2><%= @reports_count %></h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <h3 class="mt-4">⚡ Quick Links</h3>
+  <div class="d-flex gap-2 flex-wrap mb-4">
+    <%= link_to "Active Users", admin_active_users_path, class: "btn btn-outline-primary" %>
+    <%= link_to "Popular Recipes", admin_popular_recipes_path, class: "btn btn-outline-success" %>
+    <%= link_to "Reported Recipes", admin_reported_recipes_path, class: "btn btn-outline-danger" %>
+  </div>
+
+  <!-- Recent Users -->
+  <h3 class="mt-4">👥 Recent Users</h3>
+  <table class="table table-striped table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Username</th>
+        <th>Recipes</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @recent_users.each do |u| %>
+        <tr>
+          <td><%= u.username %></td>
+          <td><%= u.recipes.count %></td>
+          <td><%= time_ago_in_words(u.created_at) %> ago</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <!-- Popular Recipes -->
+  <h3 class="mt-4">⭐ Top Recipes</h3>
+  <table class="table table-striped table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Title</th>
+        <th>Likes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @popular_recipes.each do |r| %>
+        <tr>
+          <td><%= r.title %></td>
+          <td><%= r.likes.count %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <!-- Recently Reported Recipes -->
+  <h3 class="mt-4">🚨 Recently Reported Recipes</h3>
+  <table class="table table-striped table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Recipe</th>
+        <th>Author</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @recent_reported_recipes.each do |r| %>
+        <tr>
+          <td><%= r.title %></td>
+          <td><%= r.user.username %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

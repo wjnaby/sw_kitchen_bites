@@ -1,0 +1,55 @@
+<div class="container mt-4">
+  <h1>Admin Dashboard</h1>
+
+  <!-- Stats Cards -->
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3">
+        <h4>Total Users</h4>
+        <p><%= @users_count || 0 %></p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3">
+        <h4>Total Recipes</h4>
+        <p><%= @recipes_count || 0 %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Users -->
+  <h3 class="mt-4">Active Users</h3>
+  <% if @active_users.present? %>
+    <ul>
+      <% @active_users.each do |u| %>
+        <li><%= u.username %> (<%= u.recipes.count %> recipes)</li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No active users yet.</p>
+  <% end %>
+
+  <!-- Popular Recipes -->
+  <h3 class="mt-4">Popular Recipes</h3>
+  <% if @popular_recipes.present? %>
+    <ul>
+      <% @popular_recipes.each do |r| %>
+        <li><%= r.title %> (<%= r.likes.count %> likes)</li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No popular recipes yet.</p>
+  <% end %>
+
+  <!-- Recently Reported Recipes -->
+  <h3 class="mt-4">Recently Reported Recipes</h3>
+  <% if @reported_recipes.present? %>
+    <ul>
+      <% @reported_recipes.each do |r| %>
+        <li><%= r.title %> by <%= r.user.username %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No recently reported recipes.</p>
+  <% end %>
+</div>

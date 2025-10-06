@@ -1,0 +1,55 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h1 class="display-4 mb-4">🍴 Welcome to SW Kitchen Bites</h1>
+      <% if current_user && current_user.avatar.attached? %>
+        <div class="my-3">
+          <%= image_tag current_user.avatar, class: "rounded-circle", style: "width: 150px; height: 150px;" %>
+        </div>
+      <% end %>
+      <% if current_user %>
+        <p class="lead">Hello, <%= current_user.username %>!</p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row mt-4 justify-content-center">
+    <!-- Profile Card -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm text-center">
+        <div class="card-body">
+          <h5 class="card-title">My Profile</h5>
+          <p class="card-text">View or edit your profile, change password, or update avatar.</p>
+
+          <!-- ✅ Fixed links -->
+          <%= link_to "View Profile", user_path(current_user.username), class: "btn btn-primary mb-2" %><br>
+          <%= link_to "Edit Profile", edit_user_path(current_user.username), class: "btn btn-secondary" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Recipes Card -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm text-center">
+        <div class="card-body">
+          <h5 class="card-title">Manage Recipes</h5>
+          <p class="card-text">View, add, edit, or delete your recipes.</p>
+          <%= link_to "Go", recipes_path, class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Panel Card -->
+    <% if current_user&.admin? %>
+      <div class="col-md-4 mb-3">
+        <div class="card shadow-sm text-center">
+          <div class="card-body">
+            <h5 class="card-title">Admin Panel</h5>
+            <p class="card-text">Manage users, recipes, and site settings.</p>
+            <%= link_to "Go", users_path, class: "btn btn-danger" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
