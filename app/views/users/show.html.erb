@@ -48,7 +48,7 @@
               <div class="card shadow-sm h-100">
                 <% if recipe.images.attached? %>
                   <%= link_to recipe_path(recipe) do %>
-                    <%= image_tag recipe.images.first.variant(resize_to_fill: [400, 200]).processed, class: "card-img-top", style: "object-fit: cover; width: 100%; height: 200px;" %>
+                    <%= image_tag recipe.images.first.variant(resize_to_fill: [400, 400]).processed, class: "card-img-top", style: "object-fit: cover; width: 100%; height: 200px;" %>
                   <% end %>
                 <% else %>
                   <%= image_tag "default_recipe.png", class: "card-img-top", style: "width:100%; height:200px; object-fit: cover;" %>
@@ -57,6 +57,12 @@
                 <div class="card-body text-center d-flex flex-column justify-content-between" style="height: 200px;">
                   <div>
                     <h5 class="card-title"><%= link_to recipe.title, recipe_path(recipe) %></h5>
+
+                    <!-- Caption under title -->
+                    <% if recipe.caption.present? %>
+                      <p class="text-muted mb-1"><em><%= truncate(recipe.caption, length: 100) %></em></p>
+                    <% end %>
+
                     <p class="card-text text-muted">❤️ <%= recipe.likes.count %> Likes</p>
                     <p class="card-text"><%= truncate(recipe.description, length: 100) %></p>
                   </div>

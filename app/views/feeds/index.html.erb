@@ -1,87 +1,144 @@
+<style> 
+.feed-card {
+  width: 550px;  
+  border: 1px solid #ccc; 
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+  background-color: #fff;
+  padding: 1rem; /* add some padding inside */
+}
+
+.feed-card .card-body {
+  padding: 0;
+}
+
+.caption {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel-control-prev {
+  left: 15px; 
+}
+
+.carousel-control-next {
+  right: 15px; 
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+}
+
+</style>
+
 <h2 class="mb-4 text-center">Your Feed</h2>
 
 <div class="d-flex flex-column align-items-center gap-4">
   <% @recipes.each do |recipe| %>
-    <div class="card shadow-sm" style="width: 700px; min-height: 500px;">
+    <div class="card feed-card">
       <div class="card-body d-flex flex-column">
 
-        <!-- User Info & Follow Button -->
-        <div class="d-flex align-items-center mb-3">
+        <!-- User Info -->
+        <div class="d-flex align-items-center mb-2">
           <% if recipe.user.avatar.attached? %>
-            <%= link_to image_tag(recipe.user.avatar, class: "rounded-circle me-3", style: "width: 50px; height: 50px; object-fit: cover;"), user_path(username: recipe.user.username) %>
+            <%= link_to image_tag(recipe.user.avatar, class: "rounded-circle me-2", style: "width:40px;height:40px;object-fit:cover"), user_path(username: recipe.user.username) %>
           <% end %>
-
-          <strong class="me-2">
-            <%= link_to recipe.user.username, user_path(username: recipe.user.username) %>
-          </strong>
-
-          <% if recipe.user != current_user && current_user %>
-            <div class="ms-auto">
-              <% if current_user.following.exists?(id: recipe.user.id) %>
-                <%= button_to "Unfollow", unfollow_user_path(username: recipe.user.username), method: :delete, class: "btn btn-sm btn-danger" %>
-              <% else %>
-                <%= button_to "Follow", follow_user_path(username: recipe.user.username), method: :post, class: "btn btn-sm btn-primary" %>
-              <% end %>
-            </div>
-          <% end %>
+          <strong><%= link_to recipe.user.username, user_path(username: recipe.user.username), class: "text-decoration-none text-dark" %></strong>
         </div>
 
-        <!-- Recipe Title & Info -->
-        <h4 class="card-title mb-1"><%= link_to recipe.title, recipe_path(recipe) %></h4>
-        <p class="mb-2 small">Cooking Time: <%= recipe.cooking_time %> mins</p>
-        <p class="mb-3 small"><%= truncate(recipe.instructions, length: 150) %></p>
+        <!-- Recipe Title -->
+        <h5 class="mb-2"><%= link_to recipe.title, recipe_path(recipe), class: "text-decoration-none text-dark" %></h5>
 
-        <!-- Recipe Images -->
+        <!-- Images Carousel -->
         <% if recipe.images.attached? %>
-          <div class="d-flex flex-wrap gap-3 mb-3 justify-content-center">
-            <% recipe.images.each do |img| %>
-              <div style="width: 200px; height: 200px; overflow: hidden; border-radius: 8px;">
-                <%= link_to recipe_path(recipe) do %>
-                  <%= image_tag img.variant(resize_to_limit: [200, 200]), class: "img-fluid" %>
-                <% end %>
-              </div>
+          <div id="carousel-<%= recipe.id %>" class="carousel slide mb-2" data-bs-ride="false">
+            <div class="carousel-inner">
+              <% recipe.images.each_with_index do |img, index| %>
+                <div class="carousel-item <%= 'active' if index == 0 %>">
+                  <%= link_to recipe_path(recipe) do %>
+                    <div style="width:100%; height:400px; overflow:hidden; border-radius:10px;"> <!-- smaller height -->
+                      <%= image_tag img, class: "d-block w-100 h-100", style: "object-fit: cover; transition: transform 0.5s ease;" %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <% if recipe.images.count > 1 %>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<%= recipe.id %>" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-<%= recipe.id %>" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
             <% end %>
           </div>
         <% end %>
 
-        <!-- Like & Bookmark Buttons -->
-        <% if current_user && recipe.user != current_user %>
-          <div class="d-flex align-items-center mb-3 gap-3">
-            <%# Like button %>
-            <% if recipe.likes.exists?(user: current_user) %>
-              <%= button_to "❤️ Unlike", recipe_like_path(recipe), method: :delete, class: "btn btn-outline-danger flex-fill" %>
-            <% else %>
-              <%= button_to "🤍 Like", recipe_like_path(recipe), method: :post, class: "btn btn-outline-primary flex-fill" %>
-            <% end %>
-            <span class="small"><%= recipe.likes.count %> likes</span>
+        <!-- Caption -->
+        <% if recipe.caption.present? %>
+          <p class="caption"><%= truncate(recipe.caption, length: 120) %></p>
+        <% end %>
 
-            <%# Bookmark button %>
-            <% if current_user.bookmarks.exists?(recipe_id: recipe.id) %>
-              <%= button_to "🔖 Unbookmark", recipe_bookmark_path(recipe), method: :delete, class: "btn btn-outline-warning flex-fill" %>
+        <!-- Likes & Bookmarks -->
+        <% if current_user %>
+          <div class="d-flex gap-2 mb-2 flex-wrap">
+            <% if recipe.likes.exists?(user: current_user) %>
+              <%= button_to "❤️ Unlike", recipe_like_path(recipe), method: :delete, class: "btn btn-sm btn-outline-danger" %>
             <% else %>
-              <%= button_to "📌 Bookmark", recipe_bookmark_path(recipe), method: :post, class: "btn btn-outline-secondary flex-fill" %>
+              <%= button_to "🤍 Like", recipe_like_path(recipe), method: :post, class: "btn btn-sm btn-outline-primary" %>
             <% end %>
-            <span class="small"><%= recipe.bookmarks.count %> bookmarks</span>
+            <span><%= recipe.likes.count %> likes</span>
+
+            <% if current_user.bookmarks.exists?(recipe_id: recipe.id) %>
+              <%= button_to "🔖 Unbookmark", recipe_bookmark_path(recipe), method: :delete, class: "btn btn-sm btn-outline-warning" %>
+            <% else %>
+              <%= button_to "📌 Bookmark", recipe_bookmark_path(recipe), method: :post, class: "btn btn-sm btn-outline-secondary" %>
+            <% end %>
+            <span><%= recipe.bookmarks.count %> bookmarks</span>
           </div>
         <% end %>
 
         <!-- Comments Button -->
-        <div class="mb-3">
-          <%= link_to recipe_path(recipe), class: "btn btn-outline-secondary w-100 d-flex justify-content-between align-items-center" do %>
+        <div>
+          <%= link_to recipe_path(recipe), class: "btn btn-outline-secondary w-100 rounded-pill d-flex justify-content-between align-items-center" do %>
             <span>💬 Comments</span>
             <span class="badge bg-primary rounded-pill"><%= recipe.comments.count %></span>
           <% end %>
         </div>
 
-        <!-- Edit / Delete (owner only) -->
+        <!-- Edit / Delete -->
         <% if recipe.user == current_user %>
-          <div class="mt-auto d-flex gap-2">
-            <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-secondary flex-fill" %>
-            <%= link_to "Delete", recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger flex-fill" %>
+          <div class="mt-2 d-flex gap-2">
+            <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-secondary flex-fill rounded-pill" %>
+            <%= link_to "Delete", recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger flex-fill rounded-pill" %>
           </div>
         <% end %>
 
       </div>
     </div>
   <% end %>
+</div>
+
+<!-- Pagination -->
+<div class="d-flex justify-content-center mt-4">
+  <%= paginate @recipes, window: 2, outer_window: 1 %>
 </div>

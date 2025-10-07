@@ -4,6 +4,18 @@
     <%= f.text_field :title, class: "form-control" %>
   </div>
 
+  <!-- Caption Field -->
+  <div class="mb-3">
+    <%= f.label :caption, "Caption (max 30 words)", class: "form-label" %>
+    <%= f.text_area :caption, rows: 2, class: "form-control", placeholder: "Write a short caption..." %>
+  </div>
+
+  <!-- Category Dropdown -->
+  <div class="mb-3">
+    <%= f.label :category, "Category", class: "form-label" %>
+    <%= f.select :category, options_for_select([["Food", "food"], ["Beverages", "beverages"]], @recipe.category), { prompt: "Select category" }, class: "form-select" %>
+  </div>
+
   <div class="mb-3">
     <%= f.label :ingredients, class: "form-label" %>
     <%= f.text_area :ingredients, class: "form-control" %>
@@ -33,5 +45,7 @@
     <% end %>
   </div>
 
-  <%= f.submit "Save Recipe", class: "btn btn-primary" %>
+  <div class="d-grid mt-3">
+    <%= f.submit "Save Recipe", class: "btn btn-primary" %>
+  </div>
 <% end %>

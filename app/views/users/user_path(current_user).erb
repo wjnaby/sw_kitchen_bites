@@ -34,7 +34,6 @@
       <% else %>
         <%= button_to "Follow", follow_user_path(@user.username), method: :post, class: "btn btn-success" %>
       <% end %>
-      <% end %>
     </div>
   </div>
 
@@ -47,8 +46,22 @@
       <% @user.recipes.each do |recipe| %>
         <div class="col-md-4 mb-3">
           <div class="card h-100 shadow-sm">
+            <% if recipe.images.attached? %>
+              <%= link_to recipe_path(recipe) do %>
+                <%= image_tag recipe.images.first.variant(resize_to_fill: [400, 400]).processed, class: "card-img-top", style: "object-fit: cover; width: 100%; height: 200px;" %>
+              <% end %>
+            <% else %>
+              <%= image_tag "default_recipe.png", class: "card-img-top", style: "width:100%; height:200px; object-fit: cover;" %>
+            <% end %>
+
             <div class="card-body text-center">
               <h5 class="card-title"><%= link_to recipe.title, recipe_path(recipe) %></h5>
+
+              <!-- Caption under title -->
+              <% if recipe.caption.present? %>
+                <p class="text-muted mb-1"><em><%= truncate(recipe.caption, length: 100) %></em></p>
+              <% end %>
+
               <p class="text-muted"><%= truncate(recipe.description, length: 100) %></p>
             </div>
           </div>

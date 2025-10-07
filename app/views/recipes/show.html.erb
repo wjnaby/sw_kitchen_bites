@@ -1,10 +1,20 @@
 <div class="container mt-4">
   <div class="card shadow-sm p-4" id="recipe-card">
+
     <!-- Print Recipe Button -->
     <button class="btn btn-secondary mb-3" onclick="window.print()">🖨️ Print Recipe</button>
 
     <!-- Recipe Title -->
     <h2 class="card-title mb-2"><%= @recipe.title %></h2>
+
+    <!-- Category & Caption -->
+    <% if @recipe.category.present? %>
+      <p><strong>Category:</strong> <%= @recipe.category.capitalize %></p>
+    <% end %>
+
+    <% if @recipe.caption.present? %>
+      <p><em><%= @recipe.caption %></em></p>
+    <% end %>
 
     <!-- Author -->
     <p class="d-flex align-items-center gap-2">
@@ -136,7 +146,6 @@
 <!-- Print-specific CSS -->
 <style>
 @media print {
-  #Hide everything except the recipe card */
   body * {
     visibility: hidden;
   }
@@ -144,7 +153,6 @@
     visibility: visible;
   }
 
-  /* Position card at top */
   #recipe-card {
     position: absolute;
     top: 0;
@@ -152,12 +160,10 @@
     width: 100%;
   }
 
-  /* Hide non-essential elements inside the card */
   .non-printable {
     display: none !important;
   }
 
-  /* Images resize nicely */
   img {
     max-width: 100%;
     height: auto;

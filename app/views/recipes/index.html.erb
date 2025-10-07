@@ -5,7 +5,19 @@
   <% @recipes.select { |recipe| recipe.user == current_user }.each do |recipe| %>
     <div class="col-md-4 mb-3">
       <div class="card shadow-sm p-3 h-100">
+
+        <!-- Recipe Title -->
         <h5><%= recipe.title %></h5>
+
+        <!-- Category -->
+        <% if recipe.category.present? %>
+          <p class="mb-1"><strong>Category:</strong> <%= recipe.category.capitalize %></p>
+        <% end %>
+
+        <!-- Caption -->
+        <% if recipe.caption.present? %>
+          <p class="mb-1"><em><%= truncate(recipe.caption, length: 50) %></em></p>
+        <% end %>
 
         <!-- Display multiple images -->
         <% if recipe.images.attached? %>
@@ -18,15 +30,17 @@
           </div>
         <% end %>
 
-        <p>Cooking Time: <%= recipe.cooking_time %> mins</p>
+        <!-- Cooking Time -->
+        <p class="mb-1">Cooking Time: <%= recipe.cooking_time %> mins</p>
 
+        <!-- Instructions Preview -->
         <% if recipe.instructions.present? %>
-          <p><strong>Instructions:</strong> <%= truncate(recipe.instructions, length: 50) %></p>
+          <p class="mb-1"><strong>Instructions:</strong> <%= truncate(recipe.instructions, length: 50) %></p>
         <% end %>
 
+        <!-- Action Buttons -->
         <div class="d-flex gap-1 mt-2">
           <%= link_to "View", recipe_path(recipe), class: "btn btn-primary btn-sm" %>
-
           <% if recipe.user == current_user || current_user.admin? %>
             <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-secondary btn-sm" %>
             <%= link_to "Delete", recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-sm" %>

@@ -1,5 +1,5 @@
 class Recipe < ApplicationRecord
-  # Associations
+  # ---------------- Associations ----------------
   belongs_to :user
 
   # Multiple images with a limit
@@ -21,11 +21,16 @@ class Recipe < ApplicationRecord
   has_many :reports, dependent: :destroy
   scope :reported, -> { joins(:reports).distinct }
 
-  # Validations
+  # ---------------- Validations ----------------
   validates :title, :ingredients, :instructions, :cooking_time, presence: true
+
+  # New Validations
+  validates :caption, length: { maximum: 200 }, allow_blank: true  # ~30 words
+  validates :category, inclusion: { in: ["food", "beverages"] }
 
   private
 
+  # Limit number of images
   def images_count_within_limit
     if images.attached? && images.count > 5
       errors.add(:images, "You can attach up to 5 images only")

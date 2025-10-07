@@ -5,6 +5,16 @@
   </div>
 
   <div class="mb-3">
+    <%= f.label :caption, "Caption (max 30 words)", class: "form-label" %>
+    <%= f.text_area :caption, rows: 2, class: "form-control", placeholder: "Write a short caption..." %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :category, "Category", class: "form-label" %>
+    <%= f.select :category, options_for_select([["Food", "food"], ["Beverages", "beverages"]], @recipe.category), { prompt: "Select category" }, class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
     <%= f.label :ingredients, class: "form-label" %>
     <%= f.text_area :ingredients, rows: 4, class: "form-control" %>
   </div>

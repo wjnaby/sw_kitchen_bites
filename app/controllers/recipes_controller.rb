@@ -81,8 +81,19 @@ class RecipesController < ApplicationController
     @recipe = Recipe.find(params[:id])
   end
 
+  # ✅ Updated strong parameters to include caption and category
   def recipe_params
-    params.require(:recipe).permit(:title, :description, :ingredients, :instructions, :cooking_time, :difficulty, images: [])
+    params.require(:recipe).permit(
+      :title,
+      :description,
+      :ingredients,
+      :instructions,
+      :cooking_time,
+      :difficulty,
+      :caption,        # added caption
+      :category,       # added category
+      images: []       # multiple images
+    )
   end
 
   def authorized?
