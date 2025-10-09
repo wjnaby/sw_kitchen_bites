@@ -1,4 +1,5 @@
-<style> 
+<style>
+/* ---------------- Feed Card ---------------- */
 .feed-card {
   width: 550px;  
   border: 1px solid #ccc; 
@@ -7,21 +8,18 @@
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   margin-bottom: 2rem;
   background-color: #fff;
-  padding: 1rem; /* add some padding inside */
-}
-
-.feed-card .card-body {
-  padding: 0;
+  padding: 1rem;
 }
 
 .caption {
   font-style: italic;
-  font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #222;
+  margin-bottom: 1rem;
   text-align: left;
 }
 
+/* ---------------- Carousel ---------------- */
 .carousel-control-prev,
 .carousel-control-next {
   width: 50px;
@@ -45,7 +43,6 @@
   width: 50px;
   height: 50px;
 }
-
 </style>
 
 <h2 class="mb-4 text-center">Your Feed</h2>
@@ -73,7 +70,7 @@
               <% recipe.images.each_with_index do |img, index| %>
                 <div class="carousel-item <%= 'active' if index == 0 %>">
                   <%= link_to recipe_path(recipe) do %>
-                    <div style="width:100%; height:400px; overflow:hidden; border-radius:10px;"> <!-- smaller height -->
+                    <div style="width:100%; height:400px; overflow:hidden; border-radius:10px;">
                       <%= image_tag img, class: "d-block w-100 h-100", style: "object-fit: cover; transition: transform 0.5s ease;" %>
                     </div>
                   <% end %>
@@ -101,19 +98,17 @@
         <!-- Likes & Bookmarks -->
         <% if current_user %>
           <div class="d-flex gap-2 mb-2 flex-wrap">
-            <% if recipe.likes.exists?(user: current_user) %>
-              <%= button_to "❤️ Unlike", recipe_like_path(recipe), method: :delete, class: "btn btn-sm btn-outline-danger" %>
-            <% else %>
-              <%= button_to "🤍 Like", recipe_like_path(recipe), method: :post, class: "btn btn-sm btn-outline-primary" %>
-            <% end %>
-            <span><%= recipe.likes.count %> likes</span>
+            <button class="like-btn btn btn-sm <%= recipe.likes.exists?(user: current_user) ? 'btn-outline-danger' : 'btn-outline-primary' %>"
+                    data-recipe-id="<%= recipe.id %>">
+              <%= recipe.likes.exists?(user: current_user) ? "❤️ Unlike" : "🤍 Like" %>
+            </button>
+            <span id="like-count-<%= recipe.id %>"><%= recipe.likes.count %> likes</span>
 
-            <% if current_user.bookmarks.exists?(recipe_id: recipe.id) %>
-              <%= button_to "🔖 Unbookmark", recipe_bookmark_path(recipe), method: :delete, class: "btn btn-sm btn-outline-warning" %>
-            <% else %>
-              <%= button_to "📌 Bookmark", recipe_bookmark_path(recipe), method: :post, class: "btn btn-sm btn-outline-secondary" %>
-            <% end %>
-            <span><%= recipe.bookmarks.count %> bookmarks</span>
+            <button class="bookmark-btn btn btn-sm <%= current_user.bookmarks.exists?(recipe_id: recipe.id) ? 'btn-outline-warning' : 'btn-outline-secondary' %>"
+                    data-recipe-id="<%= recipe.id %>">
+              <%= current_user.bookmarks.exists?(recipe_id: recipe.id) ? "🔖 Unbookmark" : "📌 Bookmark" %>
+            </button>
+            <span id="bookmark-count-<%= recipe.id %>"><%= recipe.bookmarks.count %> bookmarks</span>
           </div>
         <% end %>
 
@@ -142,3 +137,50 @@
 <div class="d-flex justify-content-center mt-4">
   <%= paginate @recipes, window: 2, outer_window: 1 %>
 </div>
+
+<!-- ---------------- Inline JS for AJAX Likes & Bookmarks ---------------- -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Handle Likes
+  document.querySelectorAll(".like-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const recipeId = btn.dataset.recipeId;
+      const liked = btn.innerText.includes("❤️");
+
+      fetch(`/recipes/${recipeId}/like`, {
+        method: liked ? "DELETE" : "POST",
+        headers: { "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content, "Accept": "application/json" },
+        credentials: "same-origin"
+      })
+      .then(res => res.json())
+      .then(data => {
+        btn.innerText = data.liked ? "❤️ Unlike" : "🤍 Like";
+        btn.className = data.liked ? "like-btn btn btn-sm btn-outline-danger" : "like-btn btn btn-sm btn-outline-primary";
+        document.getElementById(`like-count-${recipeId}`).innerText = `${data.count} likes`;
+      });
+    });
+  });
+
+  // Handle Bookmarks
+  document.querySelectorAll(".bookmark-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const recipeId = btn.dataset.recipeId;
+      const bookmarked = btn.innerText.includes("🔖");
+
+      fetch(`/recipes/${recipeId}/bookmark`, {
+        method: bookmarked ? "DELETE" : "POST",
+        headers: { "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content, "Accept": "application/json" },
+        credentials: "same-origin"
+      })
+      .then(res => res.json())
+      .then(data => {
+        btn.innerText = data.bookmarked ? "🔖 Unbookmark" : "📌 Bookmark";
+        btn.className = data.bookmarked ? "bookmark-btn btn btn-sm btn-outline-warning" : "bookmark-btn btn btn-sm btn-outline-secondary";
+        document.getElementById(`bookmark-count-${recipeId}`).innerText = `${data.count} bookmarks`;
+      });
+    });
+  });
+
+});
+</script>

@@ -1,41 +1,172 @@
-<table class="table table-striped text-center align-middle shadow-sm">
-  <thead class="table-dark">
-    <tr>
-      <th>#</th>
-      <th>Title</th>
-      <th>Author</th>
-      <th>Created At</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @recipes.each_with_index do |recipe, index| %>
-      <tr>
-        <!-- Correct numbering across pages -->
-        <td><%= index + 1 + ((@recipes.current_page - 1) * @recipes.limit_value) %></td>
-        <td><%= recipe.title %></td>
-        <td><%= recipe.user&.username || "Unknown" %></td>
-        <td><%= recipe.created_at.strftime("%d %b %Y") %></td>
-        <td>
-          <!-- View button -->
-          <%= link_to "View",
-              admin_view_recipe_path(recipe),
-              class: "btn btn-sm btn-primary" %>
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Manage All Recipes</h1>
 
-          <!-- Delete button -->
-          <%= button_to "Delete",
-              admin_destroy_recipe_path(recipe),
-              method: :delete,
-              form: { data: { turbo: false } },
-              class: "btn btn-sm btn-danger",
-              data: { confirm: "Are you sure you want to delete this recipe?" } %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+  <!-- Filter Buttons -->
+  <div class="d-flex justify-content-center mb-4 gap-2">
+    <button class="btn btn-outline-dark active" id="show-all">All</button>
+    <button class="btn btn-outline-primary" id="show-food">Food</button>
+    <button class="btn btn-outline-success" id="show-beverages">Beverages</button>
+  </div>
 
-<!-- Pagination links -->
-<div class="d-flex justify-content-center mt-4">
-<%= paginate @recipes %>
+  <!-- All Recipes Section -->
+  <div id="all-section">
+    <h4 class="mb-3 text-dark">📋 All Recipes</h4>
+    <table class="table table-striped text-center align-middle shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Author</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @recipes.present? %>
+          <% @recipes.each_with_index do |recipe, index| %>
+            <tr>
+              <td><%= index + 1 + ((@recipes.current_page - 1) * @recipes.limit_value) %></td>
+              <td><%= recipe.title %></td>
+              <td><%= recipe.category&.capitalize || "N/A" %></td>
+              <td><%= recipe.user&.username || "Unknown" %></td>
+              <td><%= recipe.created_at.strftime("%d %b %Y") %></td>
+              <td>
+                <%= link_to "View", admin_view_recipe_path(recipe), class: "btn btn-sm btn-primary" %>
+                <%= button_to "Delete", admin_destroy_recipe_path(recipe),
+                    method: :delete,
+                    form: { data: { turbo: false } },
+                    class: "btn btn-sm btn-danger",
+                    data: { confirm: "Are you sure you want to delete this recipe?" } %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="6" class="text-muted">No recipes found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center mt-4">
+      <%= paginate @recipes %>
+    </div>
+  </div>
+
+  <!-- Food Recipes Section -->
+  <div id="food-section" style="display: none;">
+    <h4 class="mb-3 text-primary">🍽️ Food Recipes</h4>
+    <table class="table table-striped text-center align-middle shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @food_recipes.present? %>
+          <% @food_recipes.each_with_index do |recipe, index| %>
+            <tr>
+              <td><%= index + 1 + ((@food_recipes.current_page - 1) * @food_recipes.limit_value) %></td>
+              <td><%= recipe.title %></td>
+              <td><%= recipe.user&.username || "Unknown" %></td>
+              <td><%= recipe.created_at.strftime("%d %b %Y") %></td>
+              <td>
+                <%= link_to "View", admin_view_recipe_path(recipe), class: "btn btn-sm btn-primary" %>
+                <%= button_to "Delete", admin_destroy_recipe_path(recipe),
+                    method: :delete,
+                    form: { data: { turbo: false } },
+                    class: "btn btn-sm btn-danger",
+                    data: { confirm: "Are you sure you want to delete this recipe?" } %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="5" class="text-muted">No food recipes found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center mt-4">
+      <%= paginate @food_recipes, param_name: :food_page %>
+    </div>
+  </div>
+
+  <!-- Beverages Recipes Section -->
+  <div id="beverages-section" style="display: none;">
+    <h4 class="mb-3 text-success">☕ Beverages Recipes</h4>
+    <table class="table table-striped text-center align-middle shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @beverage_recipes.present? %>
+          <% @beverage_recipes.each_with_index do |recipe, index| %>
+            <tr>
+              <td><%= index + 1 + ((@beverage_recipes.current_page - 1) * @beverage_recipes.limit_value) %></td>
+              <td><%= recipe.title %></td>
+              <td><%= recipe.user&.username || "Unknown" %></td>
+              <td><%= recipe.created_at.strftime("%d %b %Y") %></td>
+              <td>
+                <%= link_to "View", admin_view_recipe_path(recipe), class: "btn btn-sm btn-primary" %>
+                <%= button_to "Delete", admin_destroy_recipe_path(recipe),
+                    method: :delete,
+                    form: { data: { turbo: false } },
+                    class: "btn btn-sm btn-danger",
+                    data: { confirm: "Are you sure you want to delete this recipe?" } %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="5" class="text-muted">No beverage recipes found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center mt-4">
+      <%= paginate @beverage_recipes, param_name: :beverage_page %>
+    </div>
+  </div>
 </div>
+
+<!-- JS Toggle -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const allBtn = document.getElementById("show-all");
+    const foodBtn = document.getElementById("show-food");
+    const bevBtn = document.getElementById("show-beverages");
+
+    const allSection = document.getElementById("all-section");
+    const foodSection = document.getElementById("food-section");
+    const bevSection = document.getElementById("beverages-section");
+
+    function toggleSection(show) {
+      allSection.style.display = show === "all" ? "block" : "none";
+      foodSection.style.display = show === "food" ? "block" : "none";
+      bevSection.style.display = show === "bev" ? "block" : "none";
+
+      [allBtn, foodBtn, bevBtn].forEach(btn => btn.classList.remove("active"));
+      if (show === "all") allBtn.classList.add("active");
+      if (show === "food") foodBtn.classList.add("active");
+      if (show === "bev") bevBtn.classList.add("active");
+    }
+
+    allBtn.addEventListener("click", () => toggleSection("all"));
+    foodBtn.addEventListener("click", () => toggleSection("food"));
+    bevBtn.addEventListener("click", () => toggleSection("bev"));
+  });
+</script>

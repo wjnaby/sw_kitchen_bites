@@ -8,9 +8,9 @@ class SearchController < ApplicationController
       # Search users by username (case-insensitive)
       @users = User.where("LOWER(username) LIKE ?", "%#{@query}%")
 
-      # Search recipes by title, description, or ingredients (case-insensitive)
+      # Search recipes by title, description, ingredients, or category (case-insensitive)
       @recipes = Recipe.where(
-        "LOWER(title) LIKE :q OR LOWER(description) LIKE :q OR LOWER(ingredients) LIKE :q",
+        "LOWER(title) LIKE :q OR LOWER(description) LIKE :q OR LOWER(ingredients) LIKE :q OR LOWER(category) LIKE :q",
         q: "%#{@query}%"
       )
     else

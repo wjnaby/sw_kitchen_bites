@@ -1,19 +1,29 @@
 <div class="container mt-4">
   <h1>🚨 Reported Recipes</h1>
+
   <table class="table table-striped table-hover mt-3">
     <thead class="table-light">
       <tr>
         <th>Recipe</th>
         <th>Author</th>
-        <th>Reports</th>
+        <th>Total Reports</th>
+        <th>Last Reported</th>
       </tr>
     </thead>
+
     <tbody>
       <% @reported_recipes.each do |r| %>
         <tr>
           <td><%= r.title %></td>
           <td><%= r.user.username %></td>
-          <td><%= r.reports.count %></td>
+          <td><%= r.reports_count %></td>
+          <td>
+            <% if r.last_reported_at.present? %>
+              <%= r.last_reported_at.strftime("%d %b %Y, %I:%M %p") %>
+            <% else %>
+              N/A
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>

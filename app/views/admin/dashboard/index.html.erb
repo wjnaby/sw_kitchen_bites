@@ -36,4 +36,57 @@
     <%= link_to "All Recipes", admin_all_recipes_path, class: "btn btn-outline-success" %>
     <%= link_to "Reports", admin_reported_recipes_path, class: "btn btn-outline-danger" %>
   </div>
+
+  <!-- Charts -->
+  <h3 class="mt-5">📈 Analytics</h3>
+  <canvas id="dashboardChart" height="100"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const ctx = document.getElementById('dashboardChart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Users', 'Recipes', 'Reports'],
+          datasets: [{
+            label: 'Count',
+            data: [<%= @users_count %>, <%= @recipes_count %>, <%= @reports_count %>],
+            backgroundColor: ['#0d6efd', '#198754', '#dc3545']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, precision:0 }
+          }
+        }
+      });
+    });
+  </script>
+
+  <!-- Most Active Users -->
+  <h3 class="mt-5">🔥 Most Active Users</h3>
+  <ul class="list-group mb-4">
+    <% @most_active_users.each do |user| %>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <%= user.username %>
+        <span class="badge bg-primary rounded-pill"><%= user.recipes_count %> recipes</span>
+      </li>
+    <% end %>
+  </ul>
+
+  <!-- Most Liked Recipes -->
+  <h3 class="mt-5">❤️ Most Liked Recipes</h3>
+  <ul class="list-group mb-4">
+    <% @most_liked_recipes.each do |recipe| %>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <%= recipe.title %> by <%= recipe.user&.username || "Unknown" %>
+        <span class="badge bg-success rounded-pill"><%= recipe.likes_count %> likes</span>
+      </li>
+    <% end %>
+  </ul>
 </div>

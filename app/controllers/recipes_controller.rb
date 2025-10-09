@@ -4,27 +4,42 @@ class RecipesController < ApplicationController
 
   # GET /recipes
   def index
-    # Eager load user and images efficiently
-    @recipes = Recipe
-      .includes(:user, images_attachments: :blob)  # avoid N+1 queries
-      .order(created_at: :desc)
-      .page(params[:page])                        # pagination
-      .per(10)                                    # limit 10 per page
+    if user_signed_in?
+      # ✅ Only show recipes created by the current user
+      @recipes = Recipe
+                    .where(user_id: current_user.id)
+                    .includes(:user, images_attachments: :blob)
+                    .order(created_at: :desc)
+                    .page(params[:page])
+                    .per(10)
+    else
+      # For visitors (if you allow it), show all recipes
+      @recipes = Recipe
+                    .includes(:user, images_attachments: :blob)
+                    .order(created_at: :desc)
+                    .page(params[:page])
+                    .per(10)
+    end
+
+    # ✅ Redirect if the user is on an empty page
+    if @recipes.empty? && params[:page].to_i > 1
+      redirect_to recipes_path(page: @recipes.total_pages)
+    end
   end
 
   # GET /recipes/:id
   def show
     @comment = Comment.new
     @comments = @recipe.comments
-                       .includes(:user)          # eager load comment authors
+                       .includes(:user)
                        .order(created_at: :asc)
 
     respond_to do |format|
       format.html
       format.pdf do
-        render pdf: "recipe_#{@recipe.id}",             # PDF filename
-               template: "recipes/show.html.erb",      # view template
-               layout: "pdf.html",                     # optional PDF layout
+        render pdf: "recipe_#{@recipe.id}",
+               template: "recipes/show.html.erb",
+               layout: "pdf.html",
                page_size: 'A4',
                orientation: 'Portrait',
                encoding: "UTF-8"
@@ -69,7 +84,7 @@ class RecipesController < ApplicationController
   def destroy
     if authorized?
       @recipe.destroy
-      redirect_to feed_path, notice: "Recipe successfully deleted."
+      redirect_to recipes_path, notice: "Recipe successfully deleted."
     else
       redirect_to recipe_path(@recipe), alert: "Not authorized"
     end
@@ -81,7 +96,6 @@ class RecipesController < ApplicationController
     @recipe = Recipe.find(params[:id])
   end
 
-  # ✅ Updated strong parameters to include caption and category
   def recipe_params
     params.require(:recipe).permit(
       :title,
@@ -90,9 +104,9 @@ class RecipesController < ApplicationController
       :instructions,
       :cooking_time,
       :difficulty,
-      :caption,        # added caption
-      :category,       # added category
-      images: []       # multiple images
+      :caption,
+      :category,
+      images: []
     )
   end
 
