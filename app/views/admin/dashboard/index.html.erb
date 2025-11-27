@@ -1,92 +1,206 @@
 <div class="container mt-4">
-  <h1 class="mb-4">📊 Admin Dashboard</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold">📊 Admin Dashboard</h1>
+    <small class="text-muted">Last updated: <%= Time.current.strftime("%B %d, %Y at %I:%M %p") %></small>
+  </div>
 
   <!-- Stats Cards -->
-  <div class="row">
-    <div class="col-md-4 mb-3">
-      <div class="card text-center shadow-sm border-primary">
-        <div class="card-body">
-          <h5 class="card-title text-primary">👥 Users</h5>
-          <h2><%= @users_count %></h2>
+  <div class="row g-3 mb-5">
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0 hover-lift">
+        <div class="card-body text-center p-4">
+          <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <span style="font-size: 2rem;">👥</span>
+          </div>
+          <h5 class="card-title text-primary fw-semibold mb-2">Total Users</h5>
+          <h2 class="display-4 fw-bold mb-0"><%= @users_count %></h2>
         </div>
       </div>
     </div>
-    <div class="col-md-4 mb-3">
-      <div class="card text-center shadow-sm border-success">
-        <div class="card-body">
-          <h5 class="card-title text-success">📖 Recipes</h5>
-          <h2><%= @recipes_count %></h2>
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0 hover-lift">
+        <div class="card-body text-center p-4">
+          <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <span style="font-size: 2rem;">📖</span>
+          </div>
+          <h5 class="card-title text-success fw-semibold mb-2">Total Recipes</h5>
+          <h2 class="display-4 fw-bold mb-0"><%= @recipes_count %></h2>
         </div>
       </div>
     </div>
-    <div class="col-md-4 mb-3">
-      <div class="card text-center shadow-sm border-danger">
-        <div class="card-body">
-          <h5 class="card-title text-danger">🚨 Reports</h5>
-          <h2><%= @reports_count %></h2>
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0 hover-lift">
+        <div class="card-body text-center p-4">
+          <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <span style="font-size: 2rem;">🚨</span>
+          </div>
+          <h5 class="card-title text-danger fw-semibold mb-2">Pending Reports</h5>
+          <h2 class="display-4 fw-bold mb-0"><%= @reports_count %></h2>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Quick Links -->
-  <h3 class="mt-4">⚡ Quick Links</h3>
-  <div class="d-flex gap-2 flex-wrap mb-4">
-    <%= link_to "All Users", admin_all_users_path, class: "btn btn-outline-primary" %>
-    <%= link_to "All Recipes", admin_all_recipes_path, class: "btn btn-outline-success" %>
-    <%= link_to "Reports", admin_reported_recipes_path, class: "btn btn-outline-danger" %>
+  <div class="card shadow-sm border-0 mb-5">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3">⚡ Quick Actions</h5>
+      <div class="d-flex gap-2 flex-wrap">
+        <%= link_to admin_all_users_path, class: "btn btn-primary px-4 py-2" do %>
+          <i class="bi bi-people-fill me-2"></i>All Users
+        <% end %>
+        <%= link_to admin_all_recipes_path, class: "btn btn-success px-4 py-2" do %>
+          <i class="bi bi-book-fill me-2"></i>All Recipes
+        <% end %>
+        <%= link_to admin_reported_recipes_path, class: "btn btn-danger px-4 py-2" do %>
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Reports
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <!-- Charts -->
-  <h3 class="mt-5">📈 Analytics</h3>
-  <canvas id="dashboardChart" height="100"></canvas>
+  <div class="card shadow-sm border-0 mb-5">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4">📈 Analytics Overview</h5>
+      <canvas id="dashboardChart" height="100"></canvas>
+    </div>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const ctx = document.getElementById('dashboardChart').getContext('2d');
-      const chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Users', 'Recipes', 'Reports'],
-          datasets: [{
-            label: 'Count',
-            data: [<%= @users_count %>, <%= @recipes_count %>, <%= @reports_count %>],
-            backgroundColor: ['#0d6efd', '#198754', '#dc3545']
-          }]
+  <div class="row g-4">
+    <!-- Most Active Users -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-4">🔥 Most Active Users</h5>
+          <ul class="list-group list-group-flush">
+            <% @most_active_users.each_with_index do |user, index| %>
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-bottom">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
+                    <%= index + 1 %>
+                  </div>
+                  <span class="fw-semibold"><%= user.username %></span>
+                </div>
+                <span class="badge bg-primary rounded-pill px-3 py-2"><%= user.recipes_count %> recipes</span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Most Liked Recipes -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-4">❤️ Most Liked Recipes</h5>
+          <ul class="list-group list-group-flush">
+            <% @most_liked_recipes.each_with_index do |recipe, index| %>
+              <li class="list-group-item px-0 py-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                  <div class="d-flex align-items-start gap-3 flex-grow-1">
+                    <div class="rounded-circle bg-success text-white fw-bold d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
+                      <%= index + 1 %>
+                    </div>
+                    <div>
+                      <div class="fw-semibold mb-1"><%= recipe.title %></div>
+                      <small class="text-muted">by <%= recipe.user&.username || "Unknown" %></small>
+                    </div>
+                  </div>
+                  <span class="badge bg-success rounded-pill px-3 py-2"><%= recipe.likes_count %> likes</span>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .card {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .list-group-item:last-child {
+    border-bottom: 0 !important;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const ctx = document.getElementById('dashboardChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Users', 'Recipes', 'Reports'],
+        datasets: [{
+          label: 'Count',
+          data: [<%= @users_count %>, <%= @recipes_count %>, <%= @reports_count %>],
+          backgroundColor: ['rgba(13, 110, 253, 0.8)', 'rgba(25, 135, 84, 0.8)', 'rgba(220, 53, 69, 0.8)'],
+          borderColor: ['rgb(13, 110, 253)', 'rgb(25, 135, 84)', 'rgb(220, 53, 69)'],
+          borderWidth: 2,
+          borderRadius: 8,
+          hoverBackgroundColor: ['rgba(13, 110, 253, 1)', 'rgba(25, 135, 84, 1)', 'rgba(220, 53, 69, 1)']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            cornerRadius: 8,
+            titleFont: { size: 14, weight: 'bold' },
+            bodyFont: { size: 13 }
+          }
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false }
+        scales: {
+          y: { 
+            beginAtZero: true, 
+            precision: 0,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              font: { size: 12 }
+            }
           },
-          scales: {
-            y: { beginAtZero: true, precision:0 }
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: { size: 12, weight: 'bold' }
+            }
           }
         }
-      });
+      }
     });
-  </script>
-
-  <!-- Most Active Users -->
-  <h3 class="mt-5">🔥 Most Active Users</h3>
-  <ul class="list-group mb-4">
-    <% @most_active_users.each do |user| %>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <%= user.username %>
-        <span class="badge bg-primary rounded-pill"><%= user.recipes_count %> recipes</span>
-      </li>
-    <% end %>
-  </ul>
-
-  <!-- Most Liked Recipes -->
-  <h3 class="mt-5">❤️ Most Liked Recipes</h3>
-  <ul class="list-group mb-4">
-    <% @most_liked_recipes.each do |recipe| %>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <%= recipe.title %> by <%= recipe.user&.username || "Unknown" %>
-        <span class="badge bg-success rounded-pill"><%= recipe.likes_count %> likes</span>
-      </li>
-    <% end %>
-  </ul>
-</div>
+  });
+</script>

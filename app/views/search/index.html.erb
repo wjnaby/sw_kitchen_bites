@@ -1,15 +1,365 @@
-<div class="container mt-4">
-  <h2 class="mb-4">Search Results for "<%= @query %>"</h2>
+<style>
+/* ---------------- Search Container ---------------- */
+.search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
 
-  <ul class="nav nav-tabs mb-3" id="searchTabs" role="tablist">
+.search-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 2rem;
+}
+
+.search-query {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+/* ---------------- Tabs ---------------- */
+.custom-tabs {
+  border: none;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.custom-tab {
+  border: none;
+  background: #f5f5f5;
+  color: #666;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.custom-tab:hover {
+  background: #e8e8e8;
+  color: #444;
+  transform: translateY(-2px);
+}
+
+.custom-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.tab-count {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+/* ---------------- Users List ---------------- */
+.users-list {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.user-item {
+  padding: 1.25rem 1.5rem;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.user-item:last-child {
+  border-bottom: none;
+}
+
+.user-item:hover {
+  background: #f8f9ff;
+  transform: translateX(4px);
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border: 2px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.user-avatar:hover {
+  border-color: #667eea;
+  transform: scale(1.05);
+}
+
+.username-link {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1a1a1a;
+  transition: color 0.2s ease;
+}
+
+.username-link:hover {
+  color: #667eea;
+}
+
+.user-action-btn {
+  border-radius: 20px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border-width: 2px;
+}
+
+.user-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.follow-btn {
+  background: #fff;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.follow-btn:hover {
+  background: #667eea;
+  border-color: #667eea;
+  color: #fff;
+}
+
+.unfollow-btn {
+  background: #fff;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.unfollow-btn:hover {
+  background: #ff6b6b;
+  border-color: #ff6b6b;
+  color: #fff;
+}
+
+.edit-profile-btn {
+  background: #fff;
+  border-color: #999;
+  color: #666;
+}
+
+.edit-profile-btn:hover {
+  background: #999;
+  border-color: #999;
+  color: #fff;
+}
+
+/* ---------------- Recipe Cards ---------------- */
+.recipe-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.recipe-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  height: 220px;
+  background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+}
+
+.recipe-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.recipe-card:hover .recipe-image {
+  transform: scale(1.1);
+}
+
+.recipe-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.recipe-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.recipe-title a {
+  color: #1a1a1a;
+  transition: color 0.2s ease;
+}
+
+.recipe-title a:hover {
+  color: #667eea;
+}
+
+.recipe-author {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.recipe-author a {
+  font-weight: 600;
+  color: #667eea;
+  transition: color 0.2s ease;
+}
+
+.recipe-author a:hover {
+  color: #764ba2;
+}
+
+.recipe-actions {
+  margin-top: auto;
+}
+
+.recipe-action-btn {
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border-width: 2px;
+}
+
+.recipe-action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.recipe-edit-btn {
+  background: #667eea;
+  border: none;
+  color: #fff;
+}
+
+.recipe-edit-btn:hover {
+  background: #5568d3;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.recipe-delete-btn {
+  background: #fff;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.recipe-delete-btn:hover {
+  background: #ff6b6b;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.recipe-like-btn {
+  background: #fff;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.recipe-like-btn:hover {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.recipe-unlike-btn {
+  background: #fff5f5;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.recipe-unlike-btn:hover {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.recipe-comment-btn {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  color: #666;
+}
+
+.recipe-comment-btn:hover {
+  border-color: #667eea;
+  background: #f5f7ff;
+  color: #667eea;
+}
+
+/* ---------------- Empty State ---------------- */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .search-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .search-title {
+    font-size: 1.5rem;
+  }
+  
+  .custom-tab {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .user-item {
+    padding: 1rem;
+  }
+  
+  .recipe-image-wrapper {
+    height: 200px;
+  }
+}
+</style>
+
+<div class="container search-container">
+  <h2 class="search-title">
+    Search Results for "<span class="search-query"><%= @query %></span>"
+  </h2>
+
+  <ul class="nav custom-tabs" id="searchTabs" role="tablist">
     <li class="nav-item">
-      <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
-        Users (<%= @users.count %>)
+      <button class="nav-link custom-tab active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+        👥 Users <span class="tab-count">(<%= @users.count %>)</span>
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" id="recipes-tab" data-bs-toggle="tab" data-bs-target="#recipes" type="button" role="tab">
-        Recipes (<%= @recipes.count %>)
+      <button class="nav-link custom-tab" id="recipes-tab" data-bs-toggle="tab" data-bs-target="#recipes" type="button" role="tab">
+        📖 Recipes <span class="tab-count">(<%= @recipes.count %>)</span>
       </button>
     </li>
   </ul>
@@ -18,73 +368,93 @@
     <!-- Users Tab -->
     <div class="tab-pane fade show active" id="users" role="tabpanel">
       <% if @users.present? %>
-        <ul class="list-group">
+        <ul class="list-group users-list">
           <% @users.each do |user| %>
-            <li class="list-group-item d-flex align-items-center">
+            <li class="list-group-item user-item d-flex align-items-center">
               <% if user.avatar.attached? %>
-                <%= link_to image_tag(user.avatar.variant(resize_to_limit: [40, 40]), class: "rounded-circle me-2", style: "object-fit: cover; width:40px; height:40px"), user_path(username: user.username) %>
+                <%= link_to user_path(username: user.username) do %>
+                  <%= image_tag user.avatar.variant(resize_to_limit: [40, 40]), class: "rounded-circle me-3 user-avatar" %>
+                <% end %>
               <% end %>
-              <%= link_to user.username, user_path(username: user.username), class: "fw-bold text-decoration-none" %>
+              <%= link_to user.username, user_path(username: user.username), class: "username-link text-decoration-none" %>
 
               <% if user == current_user %>
-                <%= link_to "Edit Profile", edit_user_path(current_user.username), class: "btn btn-sm btn-outline-secondary ms-auto" %>
+                <%= link_to "Edit Profile", edit_user_path(current_user.username), class: "btn btn-sm user-action-btn edit-profile-btn ms-auto" %>
               <% elsif current_user %>
                 <% if current_user.following.exists?(id: user.id) %>
-                  <%= button_to "Unfollow", unfollow_user_path(username: user.username), method: :delete, class: "btn btn-sm btn-outline-danger ms-auto" %>
+                  <%= button_to "Unfollow", unfollow_user_path(username: user.username), method: :delete, class: "btn btn-sm user-action-btn unfollow-btn ms-auto" %>
                 <% else %>
-                  <%= button_to "Follow", follow_user_path(username: user.username), method: :post, class: "btn btn-sm btn-outline-primary ms-auto" %>
+                  <%= button_to "Follow", follow_user_path(username: user.username), method: :post, class: "btn btn-sm user-action-btn follow-btn ms-auto" %>
                 <% end %>
               <% end %>
             </li>
           <% end %>
         </ul>
       <% else %>
-        <p class="text-muted">No users found.</p>
+        <div class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <p class="empty-state-text">No users found.</p>
+        </div>
       <% end %>
     </div>
 
     <!-- Recipes Tab -->
     <div class="tab-pane fade" id="recipes" role="tabpanel">
       <% if @recipes.present? %>
-        <div class="row">
+        <div class="row g-4">
           <% @recipes.each do |recipe| %>
-            <div class="col-md-4 mb-4">
-              <div class="card h-100 shadow-sm">
+            <div class="col-md-4 col-sm-6">
+              <div class="card recipe-card">
                 <% if recipe.images.attached? %>
                   <%= link_to recipe_path(recipe) do %>
-                    <%= image_tag recipe.images.first.variant(resize_to_limit: [300, 200]), class: "card-img-top", style: "object-fit: cover; width:100%; height:200px;" %>
+                    <div class="recipe-image-wrapper">
+                      <%= image_tag recipe.images.first.variant(resize_to_limit: [300, 200]), class: "recipe-image" %>
+                    </div>
                   <% end %>
                 <% end %>
 
-                <div class="card-body text-center d-flex flex-column">
-                  <h5 class="card-title"><%= link_to recipe.title, recipe_path(recipe) %></h5>
-                  <p class="text-muted mb-1">
-                    By <%= link_to recipe.user.username, user_path(username: recipe.user.username), class: "fw-bold" %>
+                <div class="card-body recipe-body">
+                  <h5 class="recipe-title">
+                    <%= link_to recipe.title, recipe_path(recipe), class: "text-decoration-none" %>
+                  </h5>
+                  <p class="recipe-author">
+                    by <%= link_to recipe.user.username, user_path(username: recipe.user.username), class: "text-decoration-none" %>
                   </p>
 
-                  <% if recipe.user == current_user %>
-                    <div class="mt-auto">
-                      <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-secondary btn-sm me-1" %>
-                      <%= link_to "Delete", recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-sm" %>
-                    </div>
-                  <% elsif current_user %>
-                    <div class="mt-auto mb-2">
-                      <% if recipe.likes.exists?(user: current_user) %>
-                        <%= button_to "❤️ Unlike (#{recipe.likes.count})", recipe_like_path(recipe), method: :delete, class: "btn btn-outline-danger btn-sm" %>
-                      <% else %>
-                        <%= button_to "🤍 Like (#{recipe.likes.count})", recipe_like_path(recipe), method: :post, class: "btn btn-primary btn-sm" %>
-                      <% end %>
-                    </div>
-                  <% end %>
+                  <div class="recipe-actions">
+                    <% if recipe.user == current_user %>
+                      <div class="d-flex gap-2 mb-2">
+                        <%= link_to "✏️ Edit", edit_recipe_path(recipe), class: "btn recipe-action-btn recipe-edit-btn flex-fill" %>
+                        <%= link_to "🗑️ Delete", recipe_path(recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn recipe-action-btn recipe-delete-btn flex-fill" %>
+                      </div>
+                    <% elsif current_user %>
+                      <div class="mb-2">
+                        <% if recipe.likes.exists?(user: current_user) %>
+                          <%= button_to recipe_like_path(recipe), method: :delete, class: "btn recipe-action-btn recipe-unlike-btn w-100" do %>
+                            ❤️ Unlike <span class="badge bg-danger ms-1"><%= recipe.likes.count %></span>
+                          <% end %>
+                        <% else %>
+                          <%= button_to recipe_like_path(recipe), method: :post, class: "btn recipe-action-btn recipe-like-btn w-100" do %>
+                            🤍 Like <span class="badge bg-light text-dark ms-1"><%= recipe.likes.count %></span>
+                          <% end %>
+                        <% end %>
+                      </div>
+                    <% end %>
 
-                  <%= link_to "💬 Comments (#{recipe.comments.count})", recipe_path(recipe), class: "btn btn-secondary btn-sm mt-1" %>
+                    <%= link_to recipe_path(recipe), class: "btn recipe-action-btn recipe-comment-btn w-100" do %>
+                      💬 Comments <span class="badge bg-secondary ms-1"><%= recipe.comments.count %></span>
+                    <% end %>
+                  </div>
                 </div>
               </div>
             </div>
           <% end %>
         </div>
       <% else %>
-        <p class="text-center text-muted">No recipes found.</p>
+        <div class="empty-state">
+          <div class="empty-state-icon">🍳</div>
+          <p class="empty-state-text">No recipes found.</p>
+        </div>
       <% end %>
     </div>
   </div>
