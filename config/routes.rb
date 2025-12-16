@@ -1,4 +1,11 @@
+require "sidekiq/web"
+
 Rails.application.routes.draw do
+  # -------------------- Sidekiq --------------------
+  authenticate :user, lambda { |u| u.admin? } do
+    mount Sidekiq::Web => "/sidekiq"
+  end
+
   # -------------------- Admin --------------------
   namespace :admin do
     root to: "dashboard#index"
@@ -34,6 +41,9 @@ Rails.application.routes.draw do
 
   # -------------------- Recipes --------------------
   resources :recipes do
+    member do
+      delete :delete_image
+    end
     resources :comments, only: [:create, :destroy]
     resource :like, only: [:create, :destroy]
     resource :bookmark, only: [:create, :destroy]

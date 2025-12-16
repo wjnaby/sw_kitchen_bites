@@ -23,6 +23,7 @@ gem "jbuilder"
 gem 'kaminari'
 gem 'kaminari-bootstrap'
 gem 'sidekiq'
+gem 'redis'
 
 
 
