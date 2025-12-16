@@ -1,10 +1,389 @@
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-  <div class="card shadow-lg p-4" style="width: 100%; max-width: 500px; border-radius: 15px;">
-    <div class="card-body">
-      <h2 class="card-title text-center mb-4">Edit Profile</h2>
+<style>
+/* ---------------- Edit Profile Container ---------------- */
+.edit-profile-wrapper {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
 
+.edit-profile-card {
+  width: 100%;
+  max-width: 600px;
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------- Card Header ---------------- */
+.edit-profile-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.edit-profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.3;
+}
+
+.edit-profile-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  letter-spacing: -0.5px;
+}
+
+.edit-profile-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------- Card Body ---------------- */
+.edit-profile-body {
+  padding: 2.5rem 2rem;
+}
+
+/* ---------------- Alerts ---------------- */
+.custom-alert {
+  border-radius: 15px;
+  border: none;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.custom-alert-danger {
+  background: linear-gradient(135deg, #fee 0%, #fdd 100%);
+  color: #c33;
+}
+
+.custom-alert ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.custom-alert li {
+  font-weight: 600;
+}
+
+/* ---------------- Form Groups ---------------- */
+.form-group-enhanced {
+  margin-bottom: 1.75rem;
+}
+
+.form-label-enhanced {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+.form-label-icon {
+  font-size: 1.2rem;
+}
+
+/* ---------------- Input Fields ---------------- */
+.form-input-enhanced {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fafafa;
+}
+
+.form-input-enhanced:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.form-input-enhanced:hover {
+  border-color: #bbb;
+  background: #fff;
+}
+
+textarea.form-input-enhanced {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ---------------- File Input ---------------- */
+.file-input-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-input-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  border: 2px dashed #ccc;
+  border-radius: 15px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.file-input-custom:hover {
+  border-color: #667eea;
+  background: #f5f7ff;
+}
+
+.file-input-custom.has-file {
+  border-color: #4ade80;
+  background: #f0fdf4;
+}
+
+.file-input-text {
+  font-weight: 600;
+  color: #666;
+}
+
+.file-input-custom:hover .file-input-text {
+  color: #667eea;
+}
+
+input[type="file"].form-input-enhanced {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* ---------------- Avatar Preview ---------------- */
+.avatar-preview-wrapper {
+  margin-top: 1.5rem;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.avatar-preview {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-preview-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 5px solid #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.avatar-preview-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-preview-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 35px;
+  height: 35px;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 1rem;
+}
+
+.avatar-preview-label {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+}
+
+/* ---------------- Submit Button ---------------- */
+.submit-btn-wrapper {
+  margin-top: 2rem;
+}
+
+.submit-btn-enhanced {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 25px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn-enhanced:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+  background: linear-gradient(135deg, #5568d3 0%, #6a42a0 100%);
+}
+
+.submit-btn-enhanced:active {
+  transform: translateY(-1px);
+}
+
+.submit-btn-enhanced:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
+}
+
+/* ---------------- Cancel Button ---------------- */
+.cancel-btn-wrapper {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.cancel-btn {
+  color: #666;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.cancel-btn:hover {
+  color: #667eea;
+  background: #f5f7ff;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .edit-profile-card {
+    max-width: 95%;
+    border-radius: 25px;
+  }
+
+  .edit-profile-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .edit-profile-title {
+    font-size: 2rem;
+  }
+
+  .edit-profile-body {
+    padding: 2rem 1.5rem;
+  }
+
+  .avatar-preview-image {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-profile-wrapper {
+    padding: 1rem 0.5rem;
+  }
+
+  .edit-profile-title {
+    font-size: 1.75rem;
+  }
+
+  .edit-profile-icon {
+    font-size: 2.5rem;
+  }
+}
+
+/* ---------------- Helper Text ---------------- */
+.helper-text {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+</style>
+
+<div class="edit-profile-wrapper">
+  <div class="edit-profile-card">
+    
+    <!-- Header -->
+    <div class="edit-profile-header">
+      <div class="edit-profile-icon">✨</div>
+      <h2 class="edit-profile-title">Edit Profile</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="edit-profile-body">
+      
+      <!-- Error Messages -->
       <% if @user.errors.any? %>
-        <div class="alert alert-danger">
+        <div class="custom-alert custom-alert-danger">
+          <strong>⚠️ Please fix the following errors:</strong>
           <ul>
             <% @user.errors.full_messages.each do |msg| %>
               <li><%= msg %></li>
@@ -13,32 +392,142 @@
         </div>
       <% end %>
 
+      <!-- Form -->
       <%= form_with model: @user, url: user_path(@user.username), method: :patch, local: true, multipart: true do |f| %>
-        <div class="mb-3">
-          <%= f.label :username, class: "form-label fw-bold" %>
-          <%= f.text_field :username, class: "form-control" %>
+        
+        <!-- Username Field -->
+        <div class="form-group-enhanced">
+          <label class="form-label-enhanced">
+            <span class="form-label-icon">👤</span>
+            Username
+          </label>
+          <%= f.text_field :username, class: "form-input-enhanced", placeholder: "Enter your username" %>
+          <div class="helper-text">
+            💡 Your unique identifier on the platform
+          </div>
         </div>
 
-        <div class="mb-3">
-          <%= f.label :bio, class: "form-label fw-bold" %>
-          <%= f.text_area :bio, class: "form-control", rows: 3 %>
+        <!-- Bio Field -->
+        <div class="form-group-enhanced">
+          <label class="form-label-enhanced">
+            <span class="form-label-icon">📝</span>
+            Bio
+          </label>
+          <%= f.text_area :bio, class: "form-input-enhanced", rows: 4, placeholder: "Tell us about yourself and your culinary journey..." %>
+          <div class="helper-text">
+            💡 Share your passion for cooking with the community
+          </div>
         </div>
 
-        <div class="mb-3">
-          <%= f.label :avatar, class: "form-label fw-bold" %>
-          <%= f.file_field :avatar, class: "form-control" %>
+        <!-- Avatar Field -->
+        <div class="form-group-enhanced">
+          <label class="form-label-enhanced">
+            <span class="form-label-icon">📸</span>
+            Profile Picture
+          </label>
+          <div class="file-input-wrapper">
+            <div class="file-input-custom" id="file-input-area">
+              <div class="file-input-text">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📷</div>
+                <div>Click to upload or drag and drop</div>
+                <div style="font-size: 0.85rem; color: #999; margin-top: 0.3rem;">PNG, JPG, GIF up to 10MB</div>
+              </div>
+            </div>
+            <%= f.file_field :avatar, class: "form-input-enhanced", accept: "image/*" %>
+          </div>
 
+          <!-- Avatar Preview -->
           <% if @user.avatar.attached? %>
-            <div class="mt-3 text-center">
-              <%= image_tag @user.avatar, class: "rounded-circle border", style: "width: 120px; height: 120px; object-fit: cover;" %>
+            <div class="avatar-preview-wrapper">
+              <div class="avatar-preview">
+                <%= image_tag @user.avatar, class: "rounded-circle avatar-preview-image", id: "avatar-preview" %>
+                <div class="avatar-preview-badge">✓</div>
+              </div>
+              <div class="avatar-preview-label">Current Profile Picture</div>
             </div>
           <% end %>
         </div>
 
-        <div class="d-grid mt-3">
-          <%= f.submit "Update Profile", class: "btn btn-primary btn-lg" %>
+        <!-- Submit Button -->
+        <div class="submit-btn-wrapper">
+          <%= f.submit "Update Profile", class: "submit-btn-enhanced" %>
         </div>
+
+        <!-- Cancel Link -->
+        <div class="cancel-btn-wrapper">
+          <%= link_to "← Back to Profile", user_path(username: @user.username), class: "cancel-btn" %>
+        </div>
+
       <% end %>
     </div>
+
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const fileInput = document.querySelector('input[type="file"]');
+  const fileInputArea = document.getElementById('file-input-area');
+  const avatarPreview = document.getElementById('avatar-preview');
+
+  if (fileInput && fileInputArea) {
+    // Handle file selection
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fileInputArea.classList.add('has-file');
+        fileInputArea.querySelector('.file-input-text').innerHTML = `
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+          <div style="color: #4ade80; font-weight: 700;">${file.name}</div>
+          <div style="font-size: 0.85rem; color: #666; margin-top: 0.3rem;">Click to change</div>
+        `;
+
+        // Preview image if it exists
+        if (avatarPreview && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            avatarPreview.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    });
+
+    // Handle drag and drop
+    fileInputArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileInputArea.style.borderColor = '#667eea';
+      fileInputArea.style.background = '#f5f7ff';
+    });
+
+    fileInputArea.addEventListener('dragleave', () => {
+      fileInputArea.style.borderColor = '#ccc';
+      fileInputArea.style.background = '#fafafa';
+    });
+
+    fileInputArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileInputArea.style.borderColor = '#ccc';
+      fileInputArea.style.background = '#fafafa';
+      
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
+
+  // Add submit button loading state
+  const form = document.querySelector('form');
+  const submitBtn = document.querySelector('.submit-btn-enhanced');
+  
+  if (form && submitBtn) {
+    form.addEventListener('submit', () => {
+      submitBtn.innerHTML = '⏳ Updating...';
+      submitBtn.style.opacity = '0.7';
+      submitBtn.style.pointerEvents = 'none';
+    });
+  }
+});
+</script>

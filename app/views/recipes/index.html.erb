@@ -1,64 +1,531 @@
-<h2>My Recipes</h2>
-<%= link_to "Post New Recipe", new_recipe_path, class: "btn btn-success mb-3" %>
+<style>
+/* ---------------- My Recipes Container ---------------- */
+.my-recipes-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
 
-<div class="row">
+/* ---------------- Page Header ---------------- */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.new-recipe-btn {
+  padding: 0.85rem 2rem;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.new-recipe-btn:hover {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4);
+  color: #fff;
+}
+
+/* ---------------- Recipe Grid ---------------- */
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* ---------------- Recipe Card ---------------- */
+.recipe-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.recipe-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation */
+.recipe-card:nth-child(1) { animation-delay: 0.1s; opacity: 0; }
+.recipe-card:nth-child(2) { animation-delay: 0.2s; opacity: 0; }
+.recipe-card:nth-child(3) { animation-delay: 0.3s; opacity: 0; }
+.recipe-card:nth-child(4) { animation-delay: 0.4s; opacity: 0; }
+.recipe-card:nth-child(5) { animation-delay: 0.5s; opacity: 0; }
+.recipe-card:nth-child(6) { animation-delay: 0.6s; opacity: 0; }
+
+/* ---------------- Card Header ---------------- */
+.card-header-section {
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.recipe-card-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+}
+
+.recipe-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.meta-icon {
+  font-size: 1rem;
+}
+
+.meta-label {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.recipe-caption {
+  color: #666;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+/* ---------------- Images Section ---------------- */
+.recipe-images {
+  padding: 0 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.images-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.5rem;
+}
+
+.image-thumbnail {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-thumbnail:hover .thumbnail-img {
+  transform: scale(1.1);
+}
+
+/* ---------------- Card Body ---------------- */
+.card-body-section {
+  padding: 0 1.5rem 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cooking-time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f0f2ff;
+  border-radius: 15px;
+  font-weight: 700;
+  color: #667eea;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  width: fit-content;
+}
+
+.instructions-preview {
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+/* ---------------- Card Actions ---------------- */
+.card-actions {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: none;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.view-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.view-btn:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a42a0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  color: #fff;
+}
+
+.edit-btn {
+  background: #f8f9fa;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.edit-btn:hover {
+  background: #f0f2ff;
+  transform: translateY(-2px);
+  color: #667eea;
+}
+
+.delete-btn {
+  background: #fff;
+  color: #ff6b6b;
+  border: 2px solid #ff6b6b;
+}
+
+.delete-btn:hover {
+  background: #ff6b6b;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+/* ---------------- Empty State ---------------- */
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.empty-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.3;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.empty-text {
+  font-size: 1rem;
+  color: #999;
+  margin-bottom: 2rem;
+}
+
+.empty-action-btn {
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.empty-action-btn:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a42a0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  color: #fff;
+}
+
+/* ---------------- Pagination ---------------- */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+.pagination {
+  gap: 0.5rem;
+}
+
+.page-link {
+  border-radius: 12px;
+  border: 2px solid #e8e8e8;
+  color: #666;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.65rem 1rem;
+  min-width: 45px;
+  text-align: center;
+}
+
+.page-link:hover {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f5f7ff 0%, #e8ebff 100%);
+  color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.page-item.active .page-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: scale(1.05);
+}
+
+.page-item.disabled .page-link {
+  opacity: 0.4;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .my-recipes-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .new-recipe-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .recipes-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .card-actions {
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    min-width: calc(50% - 0.25rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .images-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+</style>
+
+<div class="my-recipes-container">
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="page-title">📚 My Recipes</h1>
+    <%= link_to new_recipe_path, class: "new-recipe-btn" do %>
+      ➕ Post New Recipe
+    <% end %>
+  </div>
+
+  <!-- Recipes Grid -->
   <% if @recipes.any? %>
-    <% @recipes.each do |recipe| %>
-      <div class="col-md-4 mb-3">
-        <div class="card shadow-sm p-3 h-100">
+    <div class="recipes-grid">
+      <% @recipes.each do |recipe| %>
+        <div class="recipe-card">
+          
+          <!-- Card Header -->
+          <div class="card-header-section">
+            <h2 class="recipe-card-title"><%= recipe.title %></h2>
 
-          <!-- Recipe Title -->
-          <h5><%= recipe.title %></h5>
-
-          <!-- Category -->
-          <% if recipe.category.present? %>
-            <p class="mb-1"><strong>Category:</strong> <%= recipe.category.capitalize %></p>
-          <% end %>
-
-          <!-- Caption -->
-          <% if recipe.caption.present? %>
-            <p class="mb-1"><em><%= truncate(recipe.caption, length: 50) %></em></p>
-          <% end %>
-
-          <!-- Display multiple images -->
-          <% if recipe.images.attached? %>
-            <div class="d-flex flex-wrap gap-1 mb-2">
-              <% recipe.images.each do |img| %>
-                <div style="width: 80px; height: 80px; overflow: hidden;">
-                  <%= image_tag img.variant(resize_to_limit: [80, 80]).processed, class: "rounded" %>
+            <div class="recipe-meta-info">
+              <% if recipe.category.present? %>
+                <div class="meta-row">
+                  <span class="meta-icon">🏷️</span>
+                  <span class="meta-label">Category:</span>
+                  <span><%= recipe.category.capitalize %></span>
                 </div>
               <% end %>
             </div>
-          <% end %>
 
-          <!-- Cooking Time -->
-          <p class="mb-1">Cooking Time: <%= recipe.cooking_time %> mins</p>
-
-          <!-- Instructions Preview -->
-          <% if recipe.instructions.present? %>
-            <p class="mb-1"><strong>Instructions:</strong> <%= truncate(recipe.instructions, length: 50) %></p>
-          <% end %>
-
-          <!-- Action Buttons -->
-          <div class="d-flex gap-1 mt-2">
-            <%= link_to "View", recipe_path(recipe), class: "btn btn-primary btn-sm" %>
-            <% if recipe.user == current_user || current_user.admin? %>
-              <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-secondary btn-sm" %>
-              <%= link_to "Delete", recipe_path(recipe),
-                  method: :delete,
-                  data: { confirm: "Are you sure?" },
-                  class: "btn btn-danger btn-sm" %>
+            <% if recipe.caption.present? %>
+              <p class="recipe-caption"><%= truncate(recipe.caption, length: 80) %></p>
             <% end %>
           </div>
+
+          <!-- Images -->
+          <% if recipe.images.attached? %>
+            <div class="recipe-images">
+              <div class="images-gallery">
+                <% recipe.images.first(4).each do |img| %>
+                  <div class="image-thumbnail">
+                    <%= image_tag img.variant(resize_to_limit: [90, 90]).processed, class: "thumbnail-img" %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Card Body -->
+          <div class="card-body-section">
+            <div class="cooking-time-badge">
+              <span>⏱️</span>
+              <span><%= recipe.cooking_time %> mins</span>
+            </div>
+
+            <% if recipe.instructions.present? %>
+              <p class="instructions-preview">
+                <strong>Instructions:</strong> <%= truncate(recipe.instructions, length: 80) %>
+              </p>
+            <% end %>
+          </div>
+
+          <!-- Card Actions -->
+          <div class="card-actions">
+            <%= link_to recipe_path(recipe), class: "action-btn view-btn" do %>
+              👁️ View
+            <% end %>
+            
+            <% if recipe.user == current_user || current_user&.admin? %>
+              <%= link_to edit_recipe_path(recipe), class: "action-btn edit-btn" do %>
+                ✏️ Edit
+              <% end %>
+              <%= link_to recipe_path(recipe), 
+                  method: :delete,
+                  data: { confirm: "Are you sure you want to delete this recipe?" },
+                  class: "action-btn delete-btn" do %>
+                🗑️ Delete
+              <% end %>
+            <% end %>
+          </div>
+
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper">
+      <%= paginate @recipes %>
+    </div>
+
   <% else %>
-    <p class="text-center text-muted">You haven't posted any recipes yet.</p>
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h2 class="empty-title">No Recipes Yet</h2>
+      <p class="empty-text">Start sharing your culinary creations with the world!</p>
+      <%= link_to new_recipe_path, class: "empty-action-btn" do %>
+        ➕ Create Your First Recipe
+      <% end %>
+    </div>
   <% end %>
+
 </div>
 
-<!-- ✅ Pagination -->
-<div class="d-flex justify-content-center mt-4">
-  <%= paginate @recipes %>
-</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Add smooth scroll to top on pagination click
+  document.querySelectorAll('.pagination a').forEach(link => {
+    link.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // Confirm delete with custom styling
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      if (!confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
+        e.preventDefault();
+      }
+    });
+  });
+});
+</script>

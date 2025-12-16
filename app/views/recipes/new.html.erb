@@ -1,51 +1,661 @@
-<%= form_with(model: @recipe, local: true, html: { multipart: true }) do |f| %>
-  <div class="mb-3">
-    <%= f.label :title, class: "form-label" %>
-    <%= f.text_field :title, class: "form-control" %>
-  </div>
+<style>
+/* ---------------- Form Container ---------------- */
+.recipe-form-wrapper {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
 
-  <!-- Caption Field -->
-  <div class="mb-3">
-    <%= f.label :caption, "Caption (max 30 words)", class: "form-label" %>
-    <%= f.text_area :caption, rows: 2, class: "form-control", placeholder: "Write a short caption..." %>
-  </div>
+.recipe-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
 
-  <!-- Category Dropdown -->
-  <div class="mb-3">
-    <%= f.label :category, "Category", class: "form-label" %>
-    <%= f.select :category, options_for_select([["Food", "food"], ["Beverages", "beverages"]], @recipe.category), { prompt: "Select category" }, class: "form-select" %>
-  </div>
+.recipe-form-card {
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease;
+}
 
-  <div class="mb-3">
-    <%= f.label :ingredients, class: "form-label" %>
-    <%= f.text_area :ingredients, class: "form-control" %>
-  </div>
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  <div class="mb-3">
-    <%= f.label :instructions, class: "form-label" %>
-    <%= f.text_area :instructions, class: "form-control" %>
-  </div>
+/* ---------------- Form Header ---------------- */
+.form-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
 
-  <div class="mb-3">
-    <%= f.label :cooking_time, "Cooking Time (mins)", class: "form-label" %>
-    <%= f.number_field :cooking_time, class: "form-control" %>
-  </div>
+.form-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.3;
+}
 
-  <!-- Multiple Images -->
-  <div class="mb-3">
-    <%= f.label :images, "Upload Recipe Images (Max 5)", class: "form-label" %>
-    <%= f.file_field :images, multiple: true, class: "form-control" %>
+.form-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
 
-    <% if @recipe.images.attached? %>
-      <div class="mt-2 d-flex flex-wrap gap-2">
-        <% @recipe.images.each do |img| %>
-          <%= image_tag img.variant(resize_to_limit: [200, 200]).processed, class: "img-thumbnail" %>
+.form-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  letter-spacing: -0.5px;
+}
+
+.form-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------- Form Body ---------------- */
+.form-body {
+  padding: 2.5rem 2rem;
+}
+
+/* ---------------- Form Groups ---------------- */
+.form-group-enhanced {
+  margin-bottom: 2rem;
+}
+
+.form-label-enhanced {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+.label-icon {
+  font-size: 1.2rem;
+}
+
+.label-badge {
+  background: #f0f2ff;
+  color: #667eea;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+/* ---------------- Input Fields ---------------- */
+.form-input-enhanced {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fafafa;
+}
+
+.form-input-enhanced:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.form-input-enhanced:hover {
+  border-color: #bbb;
+  background: #fff;
+}
+
+textarea.form-input-enhanced {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+/* ---------------- Select Dropdown ---------------- */
+.form-select-enhanced {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 20px;
+  padding-right: 3rem;
+}
+
+.form-select-enhanced:focus {
+  outline: none;
+  border-color: #667eea;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* ---------------- File Input ---------------- */
+.file-input-section {
+  margin-bottom: 2rem;
+}
+
+.file-input-wrapper {
+  position: relative;
+}
+
+.file-input-custom {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 3px dashed #ccc;
+  border-radius: 20px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.file-input-custom:hover {
+  border-color: #667eea;
+  background: #f5f7ff;
+}
+
+.file-input-custom.has-files {
+  border-color: #4ade80;
+  background: #f0fdf4;
+}
+
+.file-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.file-input-text {
+  font-weight: 700;
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.file-input-subtext {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+input[type="file"].form-input-enhanced {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* ---------------- Image Preview ---------------- */
+.images-preview {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.preview-item:hover .preview-image {
+  transform: scale(1.1);
+}
+
+.preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.preview-item:hover .preview-overlay {
+  opacity: 1;
+}
+
+.preview-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(102, 126, 234, 0.95);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ---------------- Helper Text ---------------- */
+.helper-text {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.helper-icon {
+  font-size: 1rem;
+}
+
+/* ---------------- Character Counter ---------------- */
+.char-counter {
+  font-size: 0.85rem;
+  color: #999;
+  text-align: right;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.char-counter.warning {
+  color: #ff9800;
+}
+
+.char-counter.error {
+  color: #ff6b6b;
+}
+
+/* ---------------- Submit Section ---------------- */
+.submit-section {
+  padding: 2rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.submit-btn-enhanced {
+  width: 100%;
+  padding: 1.25rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 25px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn-enhanced:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a42a0 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+}
+
+.submit-btn-enhanced:active {
+  transform: translateY(-1px);
+}
+
+/* ---------------- Cancel Link ---------------- */
+.cancel-section {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.cancel-link {
+  color: #666;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.cancel-link:hover {
+  color: #667eea;
+  background: #f5f7ff;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .recipe-form-wrapper {
+    padding: 1rem 0.5rem;
+  }
+
+  .recipe-form-card {
+    border-radius: 20px;
+  }
+
+  .form-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .form-title {
+    font-size: 2rem;
+  }
+
+  .form-body,
+  .submit-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .images-preview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .form-title {
+    font-size: 1.75rem;
+  }
+
+  .form-icon {
+    font-size: 2.5rem;
+  }
+}
+</style>
+
+<div class="recipe-form-wrapper">
+  <div class="recipe-form-container">
+    <div class="recipe-form-card">
+      
+      <!-- Form Header -->
+      <div class="form-header">
+        <div class="form-icon">👨‍🍳</div>
+        <h1 class="form-title"><%= @recipe.new_record? ? 'Create New Recipe' : 'Edit Recipe' %></h1>
+        <p class="form-subtitle">Share your culinary masterpiece with the world</p>
+      </div>
+
+      <!-- Form Body -->
+      <div class="form-body">
+        <%= form_with(model: @recipe, local: true, html: { multipart: true }) do |f| %>
+          
+          <!-- Title Field -->
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">📝</span>
+              Recipe Title
+              <span class="label-badge">Required</span>
+            </label>
+            <%= f.text_field :title, class: "form-input-enhanced", placeholder: "e.g., Grandma's Secret Chocolate Cake" %>
+            <div class="helper-text">
+              <span class="helper-icon">💡</span>
+              Make it catchy and descriptive
+            </div>
+          </div>
+
+          <!-- Caption Field -->
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">💬</span>
+              Caption
+              <span class="label-badge">Max 30 words</span>
+            </label>
+            <%= f.text_area :caption, rows: 2, class: "form-input-enhanced", placeholder: "A short, enticing description of your recipe...", id: "caption-field", maxlength: 200 %>
+            <div class="char-counter" id="char-counter">0 / 200 characters</div>
+          </div>
+
+          <!-- Category Dropdown -->
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">🏷️</span>
+              Category
+            </label>
+            <%= f.select :category, 
+                options_for_select([["🍔 Food", "food"], ["🍹 Beverages", "beverages"]], @recipe.category), 
+                { prompt: "Select a category" }, 
+                class: "form-select-enhanced" %>
+            <div class="helper-text">
+              <span class="helper-icon">💡</span>
+              Help others find your recipe easily
+            </div>
+          </div>
+
+          <!-- Ingredients Field -->
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">🥕</span>
+              Ingredients
+              <span class="label-badge">Required</span>
+            </label>
+            <%= f.text_area :ingredients, class: "form-input-enhanced", placeholder: "List each ingredient on a new line\nExample:\n• 2 cups flour\n• 1 cup sugar\n• 3 eggs", rows: 8 %>
+            <div class="helper-text">
+              <span class="helper-icon">💡</span>
+              Enter one ingredient per line with measurements
+            </div>
+          </div>
+
+          <!-- Instructions Field -->
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">📋</span>
+              Instructions
+              <span class="label-badge">Required</span>
+            </label>
+            <%= f.text_area :instructions, class: "form-input-enhanced", placeholder: "Write each step on a new line\nExample:\n1. Preheat oven to 350°F\n2. Mix dry ingredients\n3. Add wet ingredients", rows: 10 %>
+            <div class="helper-text">
+              <span class="helper-icon">💡</span>
+              Clear step-by-step instructions help others succeed
+            </div>
+          </div>
+
+          <!-- Cooking Time Field -->
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">⏱️</span>
+              Cooking Time
+              <span class="label-badge">Minutes</span>
+            </label>
+            <%= f.number_field :cooking_time, class: "form-input-enhanced", placeholder: "e.g., 45", min: 1 %>
+            <div class="helper-text">
+              <span class="helper-icon">💡</span>
+              Total time from start to finish
+            </div>
+          </div>
+
+          <!-- Multiple Images -->
+          <div class="file-input-section">
+            <label class="form-label-enhanced">
+              <span class="label-icon">📸</span>
+              Recipe Images
+              <span class="label-badge">Max 5 images</span>
+            </label>
+            <div class="file-input-wrapper">
+              <div class="file-input-custom" id="file-input-area">
+                <div class="file-icon">📷</div>
+                <div class="file-input-text">Click to upload or drag and drop</div>
+                <div class="file-input-subtext">PNG, JPG, GIF up to 10MB each</div>
+              </div>
+              <%= f.file_field :images, multiple: true, class: "form-input-enhanced", accept: "image/*", id: "image-input" %>
+            </div>
+            <div class="helper-text">
+              <span class="helper-icon">💡</span>
+              Great photos make your recipe more appealing
+            </div>
+
+            <!-- Image Preview -->
+            <% if @recipe.images.attached? %>
+              <div class="images-preview">
+                <% @recipe.images.each_with_index do |img, index| %>
+                  <div class="preview-item">
+                    <%= image_tag img.variant(resize_to_limit: [200, 200]).processed, class: "preview-image" %>
+                    <div class="preview-overlay"></div>
+                    <div class="preview-badge">Image <%= index + 1 %></div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+            <div id="new-images-preview" class="images-preview"></div>
+          </div>
+
+          <!-- Submit Section -->
+          <div class="submit-section">
+            <%= f.submit (@recipe.new_record? ? "🚀 Publish Recipe" : "💾 Save Changes"), class: "submit-btn-enhanced" %>
+            <div class="cancel-section">
+              <%= link_to "← Cancel", (@recipe.new_record? ? recipes_path : recipe_path(@recipe)), class: "cancel-link" %>
+            </div>
+          </div>
+
         <% end %>
       </div>
-    <% end %>
-  </div>
 
-  <div class="d-grid mt-3">
-    <%= f.submit "Save Recipe", class: "btn btn-primary" %>
+    </div>
   </div>
-<% end %>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Character counter for caption
+  const captionField = document.getElementById('caption-field');
+  const charCounter = document.getElementById('char-counter');
+  
+  if (captionField && charCounter) {
+    const updateCounter = () => {
+      const length = captionField.value.length;
+      const maxLength = 200;
+      charCounter.textContent = `${length} / ${maxLength} characters`;
+      
+      if (length > maxLength * 0.9) {
+        charCounter.classList.add('error');
+        charCounter.classList.remove('warning');
+      } else if (length > maxLength * 0.75) {
+        charCounter.classList.add('warning');
+        charCounter.classList.remove('error');
+      } else {
+        charCounter.classList.remove('warning', 'error');
+      }
+    };
+    
+    captionField.addEventListener('input', updateCounter);
+    updateCounter();
+  }
+
+  // File input handling
+  const fileInput = document.getElementById('image-input');
+  const fileInputArea = document.getElementById('file-input-area');
+  const newImagesPreview = document.getElementById('new-images-preview');
+
+  if (fileInput && fileInputArea) {
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        fileInputArea.classList.add('has-files');
+        fileInputArea.querySelector('.file-input-text').textContent = `${files.length} image(s) selected`;
+        fileInputArea.querySelector('.file-input-subtext').textContent = 'Click to change';
+        
+        // Preview new images
+        newImagesPreview.innerHTML = '';
+        files.slice(0, 5).forEach((file, index) => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const div = document.createElement('div');
+              div.className = 'preview-item';
+              div.innerHTML = `
+                <img src="${e.target.result}" class="preview-image" alt="Preview ${index + 1}">
+                <div class="preview-overlay"></div>
+                <div class="preview-badge">New ${index + 1}</div>
+              `;
+              newImagesPreview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    });
+
+    // Drag and drop
+    fileInputArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileInputArea.style.borderColor = '#667eea';
+      fileInputArea.style.background = '#f5f7ff';
+    });
+
+    fileInputArea.addEventListener('dragleave', () => {
+      fileInputArea.style.borderColor = '#ccc';
+      fileInputArea.style.background = '#fafafa';
+    });
+
+    fileInputArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileInputArea.style.borderColor = '#ccc';
+      fileInputArea.style.background = '#fafafa';
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
+
+  // Form submission loading state
+  const form = document.querySelector('form');
+  const submitBtn = document.querySelector('.submit-btn-enhanced');
+  
+  if (form && submitBtn) {
+    form.addEventListener('submit', () => {
+      submitBtn.innerHTML = '⏳ Saving...';
+      submitBtn.style.opacity = '0.7';
+      submitBtn.style.pointerEvents = 'none';
+    });
+  }
+});
+</script>
