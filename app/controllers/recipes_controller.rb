@@ -1,48 +1,37 @@
 class RecipesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_recipe, only: [:show, :edit, :update, :destroy]
+  before_action :set_recipe, only: [:show, :edit, :update, :destroy, :delete_image]
 
   # GET /recipes
   def index
     if user_signed_in?
-      # ✅ Only show recipes created by the current user
-      @recipes = Recipe
-                    .where(user_id: current_user.id)
-                    .includes(:user, images_attachments: :blob)
-                    .order(created_at: :desc)
-                    .page(params[:page])
-                    .per(10)
+      @recipes = Recipe.where(user_id: current_user.id)
+                       .includes(:user, images_attachments: :blob)
+                       .order(created_at: :desc)
+                       .page(params[:page])
+                       .per(10)
     else
-      # For visitors (if you allow it), show all recipes
-      @recipes = Recipe
-                    .includes(:user, images_attachments: :blob)
-                    .order(created_at: :desc)
-                    .page(params[:page])
-                    .per(10)
+      @recipes = Recipe.includes(:user, images_attachments: :blob)
+                       .order(created_at: :desc)
+                       .page(params[:page])
+                       .per(10)
     end
 
-    # ✅ Redirect if the user is on an empty page
-    if @recipes.empty? && params[:page].to_i > 1
-      redirect_to recipes_path(page: @recipes.total_pages)
-    end
+    # Redirect if page is empty
+    redirect_to recipes_path(page: @recipes.total_pages) if @recipes.empty? && params[:page].to_i > 1
   end
 
   # GET /recipes/:id
   def show
     @comment = Comment.new
-    @comments = @recipe.comments
-                       .includes(:user)
-                       .order(created_at: :asc)
+    @comments = @recipe.comments.includes(:user).order(created_at: :asc)
 
     respond_to do |format|
       format.html
       format.pdf do
-        render pdf: "recipe_#{@recipe.id}",
-               template: "recipes/show.html.erb",
-               layout: "pdf.html",
-               page_size: 'A4',
-               orientation: 'Portrait',
-               encoding: "UTF-8"
+        # Generate PDF asynchronously
+        RecipePdfJob.perform_later(@recipe.id)
+        redirect_to recipe_path(@recipe), notice: "PDF generation started. You will be notified when ready."
       end
     end
   end
@@ -56,6 +45,10 @@ class RecipesController < ApplicationController
   def create
     @recipe = current_user.recipes.build(recipe_params)
     if @recipe.save
+      # Enqueue background jobs
+      RecipeNotificationJob.perform_later(@recipe.id)
+      FeedCacheJob.perform_later(current_user.id) # refresh feed cache
+
       redirect_to recipe_path(@recipe), notice: "Recipe successfully created."
     else
       render :new, status: :unprocessable_entity
@@ -71,6 +64,10 @@ class RecipesController < ApplicationController
   def update
     if authorized?
       if @recipe.update(recipe_params)
+        # Enqueue jobs for notifications and feed cache refresh
+        RecipeNotificationJob.perform_later(@recipe.id)
+        FeedCacheJob.perform_later(current_user.id)
+
         redirect_to recipe_path(@recipe), notice: "Recipe successfully updated."
       else
         render :edit, status: :unprocessable_entity
@@ -84,9 +81,26 @@ class RecipesController < ApplicationController
   def destroy
     if authorized?
       @recipe.destroy
+      FeedCacheJob.perform_later(current_user.id) # refresh feed cache
       redirect_to recipes_path, notice: "Recipe successfully deleted."
     else
       redirect_to recipe_path(@recipe), alert: "Not authorized"
+    end
+  end
+
+  # DELETE /recipes/:id/delete_image
+  def delete_image
+    unless authorized?
+      redirect_to recipe_path(@recipe), alert: "Not authorized" and return
+    end
+
+    image = @recipe.images.find_by(id: params[:image_id])
+    
+    if image
+      image.purge
+      redirect_to edit_recipe_path(@recipe), notice: "Image deleted successfully."
+    else
+      redirect_to edit_recipe_path(@recipe), alert: "Image not found."
     end
   end
 
@@ -98,14 +112,8 @@ class RecipesController < ApplicationController
 
   def recipe_params
     params.require(:recipe).permit(
-      :title,
-      :description,
-      :ingredients,
-      :instructions,
-      :cooking_time,
-      :difficulty,
-      :caption,
-      :category,
+      :title, :description, :ingredients, :instructions,
+      :cooking_time, :difficulty, :caption, :category,
       images: []
     )
   end

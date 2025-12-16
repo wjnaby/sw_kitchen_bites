@@ -1,58 +1,193 @@
-<%= form_with(model: @recipe, local: true, html: { multipart: true }) do |f| %>
-  <!-- Title -->
-  <div class="mb-3">
-    <%= f.label :title, class: "form-label" %>
-    <%= f.text_field :title, class: "form-control" %>
-  </div>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0"><%= @recipe.new_record? ? "Create New Recipe" : "Edit Recipe" %></h3>
+        </div>
+        <div class="card-body">
+          <%= form_with(model: @recipe, local: true, html: { multipart: true }) do |f| %>
+            
+            <% if @recipe.errors.any? %>
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h5 class="alert-heading">Please fix the following errors:</h5>
+                <ul class="mb-0">
+                  <% @recipe.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            <% end %>
 
-  <!-- Caption -->
-  <div class="mb-3">
-    <%= f.label :caption, "Caption (max 30 words)", class: "form-label" %>
-    <%= f.text_area :caption, rows: 2, class: "form-control", placeholder: "Write a short caption..." %>
-  </div>
+            <!-- Title -->
+            <div class="mb-4">
+              <%= f.label :title, class: "form-label fw-bold" %>
+              <span class="text-danger">*</span>
+              <%= f.text_field :title, class: "form-control form-control-lg", placeholder: "e.g., Classic Chocolate Chip Cookies", required: true %>
+              <div class="form-text">Give your recipe an appetizing name</div>
+            </div>
 
-  <!-- Category Dropdown -->
-  <div class="mb-3">
-    <%= f.label :category, "Category", class: "form-label" %>
-    <%= f.select :category, options_for_select([["Food", "food"], ["Beverages", "beverages"]], @recipe.category), { prompt: "Select category" }, class: "form-select" %>
-  </div>
+            <!-- Caption -->
+            <div class="mb-4">
+              <%= f.label :caption, "Caption", class: "form-label fw-bold" %>
+              <span class="text-danger">*</span>
+              <small class="text-muted">(max 30 words)</small>
+              <%= f.text_area :caption, rows: 2, class: "form-control", placeholder: "A brief, enticing description of your recipe...", required: true, maxlength: 200, id: "caption-field" %>
+              <div class="form-text">
+                <span id="word-count">0</span> / 30 words
+              </div>
+            </div>
 
-  <!-- Ingredients -->
-  <div class="mb-3">
-    <%= f.label :ingredients, class: "form-label" %>
-    <%= f.text_area :ingredients, class: "form-control" %>
-  </div>
+            <!-- Category Dropdown -->
+            <div class="mb-4">
+              <%= f.label :category, "Category", class: "form-label fw-bold" %>
+              <span class="text-danger">*</span>
+              <%= f.select :category, 
+                  options_for_select([["🍕 Food", "food"], ["🥤 Beverages", "beverages"]], @recipe.category), 
+                  { prompt: "Choose a category..." }, 
+                  class: "form-select form-select-lg", 
+                  required: true %>
+            </div>
 
-  <!-- Instructions -->
-  <div class="mb-3">
-    <%= f.label :instructions, class: "form-label" %>
-    <%= f.text_area :instructions, class: "form-control" %>
-  </div>
+            <div class="row">
+              <!-- Cooking Time -->
+              <div class="col-md-6 mb-4">
+                <%= f.label :cooking_time, "Cooking Time", class: "form-label fw-bold" %>
+                <span class="text-danger">*</span>
+                <div class="input-group input-group-lg">
+                  <%= f.number_field :cooking_time, class: "form-control", min: 1, placeholder: "30", required: true %>
+                  <span class="input-group-text">minutes</span>
+                </div>
+                <div class="form-text">Total time from start to finish</div>
+              </div>
 
-  <!-- Cooking Time -->
-  <div class="mb-3">
-    <%= f.label :cooking_time, "Cooking Time (mins)", class: "form-label" %>
-    <%= f.number_field :cooking_time, class: "form-control" %>
-  </div>
+              <!-- Servings (optional addition) -->
+              <div class="col-md-6 mb-4">
+                <%= f.label :servings, "Servings", class: "form-label fw-bold" %>
+                <div class="input-group input-group-lg">
+                  <%= f.number_field :servings, class: "form-control", min: 1, placeholder: "4" %>
+                  <span class="input-group-text">people</span>
+                </div>
+                <div class="form-text">How many does this serve?</div>
+              </div>
+            </div>
 
-  <!-- Multiple Images -->
-  <div class="mb-3">
-    <%= f.label :images, "Upload Recipe Images (Max 5)", class: "form-label" %>
-    <%= f.file_field :images, multiple: true, class: "form-control" %>
+            <!-- Ingredients -->
+            <div class="mb-4">
+              <%= f.label :ingredients, class: "form-label fw-bold" %>
+              <span class="text-danger">*</span>
+              <%= f.text_area :ingredients, rows: 8, class: "form-control font-monospace", placeholder: "Enter each ingredient on a new line:\n• 2 cups all-purpose flour\n• 1 cup sugar\n• 1/2 cup butter", required: true %>
+              <div class="form-text">💡 Tip: List one ingredient per line with measurements</div>
+            </div>
 
-    <% if @recipe.images.attached? %>
-      <div class="mt-2 d-flex flex-wrap gap-2">
-        <% @recipe.images.each do |img| %>
-          <% begin %>
-            <%= image_tag img.variant(resize_to_limit: [200, 200]).processed, class: "img-thumbnail" %>
-          <% rescue ActiveStorage::FileNotFoundError %>
-            <span class="text-muted">Image missing</span>
+            <!-- Instructions -->
+            <div class="mb-4">
+              <%= f.label :instructions, class: "form-label fw-bold" %>
+              <span class="text-danger">*</span>
+              <%= f.text_area :instructions, rows: 10, class: "form-control", placeholder: "Step 1: Preheat your oven...\nStep 2: Mix the dry ingredients...\nStep 3: ...", required: true %>
+              <div class="form-text">📝 Provide clear, step-by-step instructions</div>
+            </div>
+
+            <!-- Multiple Images -->
+            <div class="mb-4">
+              <%= f.label :images, "Recipe Photos", class: "form-label fw-bold" %>
+              <small class="text-muted">(Max 5 images)</small>
+              <%= f.file_field :images, multiple: true, accept: "image/*", class: "form-control form-control-lg", id: "image-upload" %>
+              <div class="form-text">📸 Upload high-quality photos of your dish (JPG, PNG, max 5MB each)</div>
+
+              <% if @recipe.images.attached? %>
+                <div class="mt-3">
+                  <h6 class="text-muted">Current Images:</h6>
+                  <div class="row g-2">
+                    <% @recipe.images.each_with_index do |img, index| %>
+                      <div class="col-6 col-md-4 col-lg-3">
+                        <div class="position-relative">
+                          <% begin %>
+                            <%= image_tag img.variant(resize_to_limit: [300, 300]).processed, class: "img-thumbnail w-100", style: "height: 150px; object-fit: cover;" %>
+                            <div class="position-absolute top-0 end-0 p-1">
+                              <%= button_to "×", delete_image_recipe_path(@recipe, image_id: img.id), 
+                                  method: :delete, 
+                                  form: { data: { turbo_confirm: "Remove this image?" } },
+                                  class: "btn btn-danger btn-sm rounded-circle", 
+                                  style: "width: 30px; height: 30px; padding: 0; line-height: 1;" %>
+                            </div>
+                          <% rescue ActiveStorage::FileNotFoundError %>
+                            <div class="alert alert-warning mb-0">Image missing</div>
+                          <% end %>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+
+              <!-- Image Preview (for new uploads) -->
+              <div id="image-preview" class="mt-3 row g-2"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+              <%= link_to "Cancel", recipes_path, class: "btn btn-outline-secondary btn-lg" %>
+              <%= f.submit @recipe.new_record? ? "Create Recipe" : "Update Recipe", class: "btn btn-primary btn-lg px-5" %>
+            </div>
           <% end %>
-        <% end %>
+        </div>
       </div>
-    <% end %>
+    </div>
   </div>
+</div>
 
-  <!-- Submit -->
-  <%= f.submit "Save Recipe", class: "btn btn-primary" %>
-<% end %>
+<script>
+// Word counter for caption
+document.addEventListener('DOMContentLoaded', function() {
+  const captionField = document.getElementById('caption-field');
+  const wordCount = document.getElementById('word-count');
+  
+  if (captionField && wordCount) {
+    function updateWordCount() {
+      const text = captionField.value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      wordCount.textContent = words;
+      wordCount.classList.toggle('text-danger', words > 30);
+    }
+    
+    captionField.addEventListener('input', updateWordCount);
+    updateWordCount();
+  }
+
+  // Image preview
+  const imageUpload = document.getElementById('image-upload');
+  const imagePreview = document.getElementById('image-preview');
+  
+  if (imageUpload && imagePreview) {
+    imageUpload.addEventListener('change', function(e) {
+      imagePreview.innerHTML = '';
+      const files = Array.from(e.target.files).slice(0, 5);
+      
+      if (files.length > 0) {
+        const previewTitle = document.createElement('h6');
+        previewTitle.className = 'text-muted mb-2';
+        previewTitle.textContent = 'New Images to Upload:';
+        imagePreview.appendChild(previewTitle);
+      }
+      
+      files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const col = document.createElement('div');
+          col.className = 'col-6 col-md-4 col-lg-3';
+          col.innerHTML = `
+            <div class="position-relative">
+              <img src="${e.target.result}" class="img-thumbnail w-100" style="height: 150px; object-fit: cover;">
+              <span class="position-absolute top-0 start-0 badge bg-success m-1">New</span>
+            </div>
+          `;
+          imagePreview.appendChild(col);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  }
+});
+</script>
